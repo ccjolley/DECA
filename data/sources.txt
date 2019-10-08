@@ -1,0 +1,14 @@
+A4AI-Mobile-Broadband-Pricing-2019Q2.csv	Alliance for Affordable Internet, Mobile Broadband pricing
+CoreHouseholdIndicators_Jun2019.xlsx	ITU, Core Household Indicators
+FINAL_DATA_FOTN2018_TOTAL_and_CATEGORY_SCORES.xlsx	Freedom House, Freedom on the Net 2018
+Fixed_broadband_2000-2018_Jun2019_revised27082019.xls	ITU, Fixed Broadband Subscriptions
+Fixed_tel_2000-2018_Jun2019_revised_27082019.xls	ITU, Fixed Telephone Subscriptions
+index_2019_-_pour_import_1_1.csv	Reporters Without Borders Press Freedom Ranking 2019
+Individuals_Internet_2000-2018_Jun2019.xls	ITU, Percentage of individuals using the internet
+Individuals using the internet by gender_Jun2019.xlsx	ITU, Internet users by gender
+MCI_Data_2019.xlsx	GSMA, Mobile Connectivity Index
+Mobile_cellular_2000-2018_Jun2019.xls	ITU, Mobile Cellular subscriptions	
+SDG4_DS_04102019154356211.csv	Digital skills measured for SDG4
+WEF_NRI_2012-2016_Historical_Dataset.xlsx	WEF, Networked Readiness Index
+
+
