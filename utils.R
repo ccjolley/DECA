@@ -46,7 +46,12 @@ fix_adm0 <- function(df) {
                                     'Unitd Kingdm','GuineaBiss','Equa Guinea','Kyrgyz',
                                     'Korea North','Korea South','UAE','USA','SierraLeo',
                                     'Palestine','Sudan South','Papua NG','Slovak Rep',
-                                    'Trinidad'),
+                                    'Trinidad','Central African Rep.','Congo (Rep. of the)',
+                                    'Democratic People\'s Republic of Korea','Dem. People\'s Rep. of Korea',
+                                    'Dominican Rep.','Korea (Rep. of)','Lao People\'s Democratic Republic',
+                                    'Nepal (Republic of)','Taiwan, Province of China','North Macedonia',
+                                    'The Republic of North Macedonia','Hong Kong, China','Macao, China',
+                                    'Eswatini','Lao People’s Democratic Republic'),
                           country_new=c('The Bahamas','The Bahamas','Myanmar','Myanmar','Cabo Verde',
                                         'Democratic Republic of the Congo',
                                         'Democratic Republic of the Congo',
@@ -82,7 +87,10 @@ fix_adm0 <- function(df) {
                                         'Kyrgyzstan','North Korea','South Korea','United Arab Emirates',
                                         'United States of America','Sierra Leone','West Bank and Gaza',
                                         'South Sudan','Papua New Guinea','Slovakia',
-                                        'Trinidad and Tobago'))
+                                        'Trinidad and Tobago','Central African Republic','Republic of the Congo',
+                                        'North Korea','North Korea','Dominican Republic','South Korea',
+                                        'Laos','Nepal','Taiwan','Macedonia','Macedonia','Hong Kong','Macao',
+                                        'eSwatini','Laos'))
   tmp <- df %>%
     mutate(country=sub('Saint\\.','Saint',country),
            country=sub('St\\.','Saint',country)) %>%
