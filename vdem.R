@@ -32,7 +32,9 @@ vdem1 <- extract_vdem(name_pattern='^v2sm.*') %>%
   arrange(year) %>%
   summarize_all(last) %>%
   select(-year) %>%
-  fix_adm0
+  fix_adm0 %>%
+  group_by(country) %>% # Need to do this because V-Dem treats West Bank & Gaza separately, but fix_adm0 maps both together
+  summarize_all(mean)
 
 vdem2 <- extract_vdem(name_pattern='v2x_c.*') %>%
   select(vdem_country_name,year,v2x_civlib,v2x_clpol,v2x_clpriv) %>%
@@ -42,7 +44,9 @@ vdem2 <- extract_vdem(name_pattern='v2x_c.*') %>%
   arrange(year) %>%
   summarize_all(last) %>% 
   select(-year) %>%
-  fix_adm0
+  fix_adm0 %>%
+  group_by(country) %>% # Need to do this because V-Dem treats West Bank & Gaza separately, but fix_adm0 maps both together
+  summarize_all(mean)
 
 vdem <- full_join(vdem1,vdem2,by='country')
 rm(vdem1,vdem2,vdem_digital)
