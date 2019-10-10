@@ -120,7 +120,7 @@ rename_tbl <- tibble(
   short_name=sub("(% age 25+)",'',short_name,fixed=TRUE),
   short_name=sub(' (% without a financial institution account, age 15+)','',short_name,fixed=TRUE),
   short_name=sub(', ?male *','_m',short_name),
-  short_name=sub(', female *','_f',short_name),
+  short_name=sub(', ?female *','_f',short_name),
   short_name=sub(', in labor force *','_labor',short_name),
   short_name=sub(', out of labor force *','_nolabor',short_name),
   short_name=sub(', ?young adults *','_young',short_name),
@@ -156,7 +156,34 @@ wb_findex <- read_excel('data/Global Findex Database.xlsx',sheet=1) %>%
   na.omit %>%
   select(country,short_name,value) %>%
   dcast(country ~ short_name) %>%
-  fix_adm0
+  fix_adm0 %>%
+  mutate(acct_gender_gap=(acct_m-acct_f)/acct_m,              # Gender gaps
+         borrow_gender_gap=(borrow_m-borrow_f)/borrow_m,
+         dig_pay_gender_gap=(dig_pay_m-dig_pay_f)/dig_pay_m,
+         mm_gender_gap=(mm_m-mm_f)/mm_m,
+         acct_wealth_gap=(acct_rich-acct_poor)/acct_rich,     # Wealth gaps
+         borrow_wealth_gap=(borrow_rich-borrow_poor)/borrow_rich,
+         dig_pay_wealth_gap=(dig_pay_rich-dig_pay_poor)/dig_pay_rich,
+         mm_wealth_gap=(mm_rich-mm_poor)/mm_rich,
+         acct_emp_gap=(acct_labor-acct_nolabor)/acct_labor,   # Employment gaps
+         borrow_emp_gap=(borrow_labor-borrow_nolabor)/borrow_labor,
+         dig_pay_emp_gap=(dig_pay_labor-dig_pay_nolabor)/dig_pay_labor,
+         mm_emp_gap=(mm_labor-mm_nolabor)/mm_labor,
+         acct_age_gap=(acct_old-acct_young)/acct_old,         # Age gaps
+         borrow_age_gap=(borrow_old-borrow_young)/borrow_old,
+         dig_pay_age_gap=(dig_pay_old-dig_pay_young)/dig_pay_old,
+         mm_age_gap=(mm_old-mm_young)/mm_old,
+         acct_ed_gap=(acct_ed-acct_uned)/acct_ed,             # Education gaps
+         borrow_ed_gap=(borrow_ed-borrow_uned)/borrow_ed,
+         dig_pay_ed_gap=(dig_pay_ed-dig_pay_uned)/dig_pay_ed,
+         mm_ed_gap=(mm_ed-mm_uned)/mm_ed,
+         acct_rural_gap=(acct-acct_rural)/acct,               # Urban-rural gaps
+         borrow_rural_gap=(borrow-borrow_rural)/borrow,
+         dig_pay_rural_gap=(dig_pay-dig_pay_rural)/dig_pay,
+         mm_rural_gap=(mm-mm_rural)/mm) %>%
+  select(-ends_with('_m'),-ends_with('_f'),-ends_with('_rich'),-ends_with('_poor'),
+         -ends_with('_labor'),-ends_with('_nolabor'),-ends_with('_old'),-ends_with('_young'),
+         -ends_with('_ed'),-ends_with('_uned'),-ends_with('_rural'))
 
 # TODO: calculate gap scores, remove subpopulations
 
