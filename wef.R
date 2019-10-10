@@ -23,5 +23,7 @@ wef_nri <- read_excel('data/WEF_NRI_2012-2016_Historical_Dataset.xlsx',sheet=2,s
   na.omit %>%
   fix_adm0
 
+# TODO: there are some other NRI components recommended in "Access and use"
+
 wef <- full_join(wef_laws,wef_nri,by='country')
 rm(wef_laws,wef_nri)
