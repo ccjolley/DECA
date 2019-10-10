@@ -52,7 +52,8 @@ fix_adm0 <- function(df) {
                                     'Nepal (Republic of)','Taiwan, Province of China','North Macedonia',
                                     'The Republic of North Macedonia','Hong Kong, China','Macao, China',
                                     'Eswatini','Lao People’s Democratic Republic','The Democratic Republic Of The Congo',
-                                    'Islamic Republic of Iran','United Kingdom of Great Britain and Northern Ireland'),
+                                    'Islamic Republic of Iran','United Kingdom of Great Britain and Northern Ireland',
+                                    "China, People's Republic of","Egypt, Arab Republic of",'PNG',"Yemen, Republic of"),
                           country_new=c('The Bahamas','The Bahamas','Myanmar','Myanmar','Cabo Verde',
                                         'Democratic Republic of the Congo',
                                         'Democratic Republic of the Congo',
@@ -92,7 +93,7 @@ fix_adm0 <- function(df) {
                                         'North Korea','North Korea','Dominican Republic','South Korea',
                                         'Laos','Nepal','Taiwan','Macedonia','Macedonia','Hong Kong','Macao',
                                         'eSwatini','Laos','Democratic Republic of the Congo','Iran',
-                                        'United Kingdom'))
+                                        'United Kingdom','China','Egypt','Papua New Guinea','Yemen'))
   tmp <- df %>%
     mutate(country=sub('Saint\\.','Saint',country),
            country=sub('St\\.','Saint',country)) %>%
@@ -237,6 +238,18 @@ high_income <- c('Andorra','Germany','Oman','Antigua and Barbuda','Gibraltar','P
                  'Northern Mariana Islands','Uruguay','French Polynesia','Norway',
                  'Virgin Islands (U.S.)')
 setdiff(all_countries,c(low_income,lmic,umic,high_income)) # only some debatable countries
+
+# why do I need a list of non-countries? Because they are in a lot of WB datasets.
+non_countries <- c("Arab world","Developing","East Asia & Pacific",
+                   "East Asia & Pacific (excluding high income)","Euro area",
+                   "Europe & Central Asia","Europe & Central Asia (excluding high income)",
+                   "High income","High income: OECD","Latin America & Caribbean",
+                   "Latin America & Caribbean (excluding high income)",
+                   "Lower middle income","Low income","Middle East & North Africa",
+                   "Middle East & North Africa (excluding high income)",
+                   "Middle income","North America","South Asia","Sub-Saharan Africa",
+                   "Sub-Saharan Africa (excluding high income)","Upper middle income",
+                   "World",'BCEAO',"Eastern Caribbean","Eastern Caribbean Currency Union")
 
 ###############################################################################
 # Plotting functions
