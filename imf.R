@@ -8,7 +8,8 @@ imf <- imf_all %>%
   arrange(year) %>%
   summarize_all(last) %>%
   select(economy,ends_with('pop'),ends_with('pop_M'),ends_with('pop_F')) %>%
-  rename(country=economy)
+  rename(country=economy) %>%
+  fix_adm0
 
 is.na(imf) %>%
   colMeans %>%

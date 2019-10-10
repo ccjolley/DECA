@@ -15,6 +15,7 @@ eiu <- read_excel('data/economist_global_microscope_scores.xlsx') %>%
   dcast(country ~ indicator) %>% 
   rename(gov_support=2,stability_integrity=3,products_outlets=4,consumer_protection=5,
          infrastructure=6,overall=7) %>%
-  mutate(country=as.character(country))
+  mutate(country=as.character(country)) %>%
+  fix_adm0
 
 

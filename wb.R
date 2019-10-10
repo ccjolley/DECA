@@ -158,9 +158,12 @@ wb_findex <- read_excel('data/Global Findex Database.xlsx',sheet=1) %>%
   dcast(country ~ short_name) %>%
   fix_adm0
 
+# TODO: calculate gap scores, remove subpopulations
+
 wb <- full_join(wb_gpss_A,wb_gpss_B,by='country') %>%
   full_join(wb_gpss_C,by='country') %>%
   full_join(wb_findex,by='country')
-                                         
+  
+rm(wb_findex,wb_gpss_A,wb_gpss_B,wb_gpss_C,rename_tbl,pop,gdp)                                       
 
-setdiff(wb$country,all_countries)
+# setdiff(wb$country,all_countries)

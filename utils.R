@@ -54,7 +54,14 @@ fix_adm0 <- function(df) {
                                     'Eswatini','Lao People’s Democratic Republic','The Democratic Republic Of The Congo',
                                     'Islamic Republic of Iran','United Kingdom of Great Britain and Northern Ireland',
                                     "China, People's Republic of","Egypt, Arab Republic of",'PNG',"Yemen, Republic of",
-                                    'Hong Kong, SAR China'),
+                                    'Hong Kong, SAR China',"Congo Brazzaville","D.R. Congo","Congo, DR",
+                                    "Venezuela (Bolivarian Republic Of)","DRC",
+                                    "Hong Kong","Afghanistan, Islamic Republic of","Armenia, Republic of","Azerbaijan, Republic of",
+                                    "China, P.R.: Hong Kong","China, P.R.: Macao","China, P.R.: Mainland",
+                                    "Eswatini, Kingdom of","Iran, Islamic Republic of","Kosovo, Republic of",
+                                    "Marshall Islands, Republic of","Micronesia, Federated States of",
+                                    "North Macedonia, Republic of","Serbia, Republic of","Timor-Leste, Dem. Rep. of",
+                                    "Venezuela, Republica Bolivariana de","United Republic Of Tanzania"),
                           country_new=c('The Bahamas','The Bahamas','Myanmar','Myanmar','Cabo Verde',
                                         'Democratic Republic of the Congo',
                                         'Democratic Republic of the Congo',
@@ -95,7 +102,14 @@ fix_adm0 <- function(df) {
                                         'Laos','Nepal','Taiwan','Macedonia','Macedonia','Hong Kong','Macao',
                                         'eSwatini','Laos','Democratic Republic of the Congo','Iran',
                                         'United Kingdom','China','Egypt','Papua New Guinea','Yemen',
-                                        'Hong Kong'))
+                                        'Hong Kong',"Republic of the Congo","Democratic Republic of the Congo",
+                                        "Democratic Republic of the Congo","Venezuela","Democratic Republic of the Congo",
+                                        "Hong Kong","Afghanistan","Armenia","Azerbaijan",
+                                        "Hong Kong","Macao","China","eSwatini","Iran","Kosovo",
+                                        "Marshall Islands","Federated States of Micronesia",
+                                        "Macedonia","Republic of Serbia","East Timor","Venezuela",
+                                        "United Republic of Tanzania"))
+                                       
   tmp <- df %>%
     mutate(country=sub('Saint\\.','Saint',country),
            country=sub('St\\.','Saint',country)) %>%

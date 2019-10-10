@@ -22,8 +22,9 @@ secondary <- read_excel('data/2018-Affordability-Index_Indicators.xlsx',sheet=4)
   rename(broadband_plan=4,intl_bandwidth=6,secure_servers=7,investment=9) %>%
   select(1,4,6,7,9)
 
-a4ai <- left_join(a4ai_pricing,afford,by='country') %>%
-  left_join(primary,by='country') %>%
-  left_join(secondary,by='country')
+a4ai <- full_join(a4ai_pricing,afford,by='country') %>%
+  full_join(primary,by='country') %>%
+  full_join(secondary,by='country') %>%
+  fix_adm0
 
 rm(a4ai_pricing,afford,primary,secondary)
