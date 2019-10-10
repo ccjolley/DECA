@@ -53,7 +53,8 @@ fix_adm0 <- function(df) {
                                     'The Republic of North Macedonia','Hong Kong, China','Macao, China',
                                     'Eswatini','Lao People’s Democratic Republic','The Democratic Republic Of The Congo',
                                     'Islamic Republic of Iran','United Kingdom of Great Britain and Northern Ireland',
-                                    "China, People's Republic of","Egypt, Arab Republic of",'PNG',"Yemen, Republic of"),
+                                    "China, People's Republic of","Egypt, Arab Republic of",'PNG',"Yemen, Republic of",
+                                    'Hong Kong, SAR China'),
                           country_new=c('The Bahamas','The Bahamas','Myanmar','Myanmar','Cabo Verde',
                                         'Democratic Republic of the Congo',
                                         'Democratic Republic of the Congo',
@@ -93,7 +94,8 @@ fix_adm0 <- function(df) {
                                         'North Korea','North Korea','Dominican Republic','South Korea',
                                         'Laos','Nepal','Taiwan','Macedonia','Macedonia','Hong Kong','Macao',
                                         'eSwatini','Laos','Democratic Republic of the Congo','Iran',
-                                        'United Kingdom','China','Egypt','Papua New Guinea','Yemen'))
+                                        'United Kingdom','China','Egypt','Papua New Guinea','Yemen',
+                                        'Hong Kong'))
   tmp <- df %>%
     mutate(country=sub('Saint\\.','Saint',country),
            country=sub('St\\.','Saint',country)) %>%
