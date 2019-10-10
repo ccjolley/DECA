@@ -31,6 +31,7 @@ vdem1 <- extract_vdem(name_pattern='^v2sm.*') %>%
   group_by(country) %>%
   arrange(year) %>%
   summarize_all(last) %>%
+  select(-year) %>%
   fix_adm0
 
 vdem2 <- extract_vdem(name_pattern='v2x_c.*') %>%
@@ -40,6 +41,7 @@ vdem2 <- extract_vdem(name_pattern='v2x_c.*') %>%
   group_by(country) %>%
   arrange(year) %>%
   summarize_all(last) %>% 
+  select(-year) %>%
   fix_adm0
 
 vdem <- full_join(vdem1,vdem2,by='country')

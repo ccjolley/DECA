@@ -22,12 +22,14 @@ itu_gci <- gci_text[64:70] %>%
   fix_adm0
 
 
+# NOTE: not taking the individuals using the internet from this file, because
+# the file loded below in itu_ind_internet is more complete.
 itu_core <- read_excel('data/CoreHouseholdIndicators_Jun2019.xlsx',skip=2) %>%
-  select(2,4,7,10,13,16,19,25,29,32) %>%
+  select(2,4,7,10,13,16,19,25,32) %>%
   rename(country=1,hh_radio=2,hh_tv=3,hh_fixedtel=4,hh_mobile=5,hh_computer=6,
-         hh_internet=7,ind_computer=8,ind_internet=9,ind_mobile=10) %>%
+         hh_internet=7,ind_computer=8,ind_mobile=9) %>%
   filter(!is.na(country)) %>%
-  mutate_at(vars(2:10),as.numeric) %>%
+  mutate_at(vars(2:9),as.numeric) %>%
   fix_adm0
 
 itu_bb <- read_excel('data/Fixed_broadband_2000-2018_Jun2019_revised27082019.xls',skip=1) %>%

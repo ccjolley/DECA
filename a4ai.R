@@ -6,7 +6,7 @@ a4ai_pricing <- read_csv('data/A4AI-Mobile-Broadband-Pricing-2019Q2.csv') %>%
   select(country,Cost_1_GB_Share_GNICM)
 
 afford <- read_excel('data/2018-Affordability-Index_Indicators.xlsx',sheet=1) %>%
-  rename(country=1,access=2,infrastructure=3,overall=4) %>%
+  rename(country=1,access_a4ai=2,infrastructure_a4ai=3,overall_a4ai=4) %>%
   select(1:4)
 
 primary <- read_excel('data/2018-Affordability-Index_Indicators.xlsx',sheet=3,skip=1) %>%

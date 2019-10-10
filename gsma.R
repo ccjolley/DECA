@@ -4,7 +4,9 @@ library(readxl)
 mci <- read_excel('data/MCI_Data_2019.xlsx',sheet=3,skip=2) %>%
   select(2,4,6:10,`2G Coverage`,`3G Coverage`,`4G Coverage`,
          `Servers per population`,`TLDs per capita`,`IXPs per population`) %>%
-  rename(country=1,year=2,mci=3,mci_infra=4,mci_afford=5,mci_consumer=6,mci_content=7) %>%
+  rename(country=1,year=2,mci=3,mci_infra=4,mci_afford=5,mci_consumer=6,mci_content=7,
+         cov_2G=`2G Coverage`,cov_3G=`3G Coverage`,cov_4G=`4G Coverage`,
+         servers=`Servers per population`,tlds=`TLDs per capita`,ixps=`IXPs per population`) %>%
   filter(year==2018) %>%
   select(-year) %>%
   fix_adm0

@@ -15,9 +15,8 @@ all <- full_join(a4ai,eiu,by='country') %>%
   full_join(wb,by='country') %>%
   full_join(wef,by='country') 
 
-setdiff(all$country,all_countries)
-
-# TODO: look over names in all; some look funny
+# setdiff(all$country,all_countries)
+# duplicate names: overall, infrastructure, ind_internet
 
 ################################################################################
 # Function that removes columns that are NA for more than a given fraction of 
