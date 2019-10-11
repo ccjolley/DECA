@@ -58,8 +58,33 @@ ggplot(plotme2,aes(x=value,y=label,color=highlight)) +
         axis.title=element_blank(),
         axis.text.x=element_blank())
 
+# regress each variable with pc2
+pc <- read_csv('pc.csv')
 
+tmp <- left_join(vdem,pc,by='country')
 
-# TODO: add a vertical line at the point that would be predicted based on a regression with PC2,
-# a horizontal line connecting the vertical line to the highlighted dot, and color-code the dot 
-# based on whether the difference is statistically significant
+y <- lm(v2smgovfilcap ~ pc2,data=tmp,na.action=na.exclude) %>% predict()
+qplot(tmp$v2smgovfilcap,y)
+
+pred <- tmp %>%
+  mutate_at(2:21,function(x) predict(lm(x ~ tmp$pc2,na.action=na.exclude))) %>%
+  filter(country=='Kenya') %>%
+  melt %>%
+  rename(pred=value)
+
+plotme3 <- plotme2 %>%
+  left_join(pred,by=c('country','variable'))
+
+ggplot(plotme3,aes(x=value,y=label,color=highlight)) +
+  geom_jitter(data=filter(plotme2,!highlight),size=2,alpha=0.1,width=0,height=0.1) +
+  geom_point(data=filter(plotme2,highlight),size=5) +
+  geom_errorbarh(aes(xmin=pred,xmax=pred),size=1) +
+  geom_segment(aes(xend=pred,yend=label),size=1) +
+  theme_USAID + colors_USAID +
+  theme(legend.position = 'none',
+        axis.title=element_blank(),
+        axis.text.x=element_blank())
+
+# TODO: figure out how to get statistical significance. I think I can get this out of
+# the standard errors returned by lm
+

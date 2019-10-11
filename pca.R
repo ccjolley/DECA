@@ -92,7 +92,8 @@ plotme <- tibble(country=all_trim2$country,
                       pc2 < quantile(pc2,probs=f) | pc2 > quantile(pc2,probs=1-f),'a',color),
          highlight= (color != 'c'),
          label=ifelse(highlight,country,NA),
-         pc1=-pc1 # Need to do this was obvious looking at the plot
+         pc1=-pc1, # Need to do this was obvious looking at the plot
+         pc2=-pc2
   )
 
 ggplot(plotme,aes(x=pc1,y=pc2,color=color,label=label)) +
@@ -114,3 +115,6 @@ pc2_cor <- sapply(setdiff(names(all_trim2),'country'),
   sort()
 # Strongest correlations with press freedom and government filtering capacity
 
+plotme %>%
+  select(country,pc1,pc2) %>%
+  write_csv('pc.csv')
