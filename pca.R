@@ -73,7 +73,7 @@ all_imp <- all_trim2 %>%
   select(-country) %>%
   mice(m=1,seed=1234)
 
-imputed <- complete(all_imp,1) 
+imputed <- mice::complete(all_imp,1) 
 
 ###############################################################################
 # Principal components
@@ -87,7 +87,7 @@ f <- 0.03
 plotme <- tibble(country=all_trim2$country,
                  pc1=pr$x[,1],
                  pc2=pr$x[,2]) %>%
-  mutate(color=ifelse(country=='Kenya','b','c'),
+  mutate(color=ifelse(country %in% c('Kenya','Colombia','Nepal'),'b','c'),
          color=ifelse(pc1 < quantile(pc1,probs=f) | pc1 > quantile(pc1,probs=1-f) |
                       pc2 < quantile(pc2,probs=f) | pc2 > quantile(pc2,probs=1-f),'a',color),
          highlight= (color != 'c'),
