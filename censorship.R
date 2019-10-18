@@ -30,11 +30,18 @@ censorship_plot <- function(country_name,show_pred=TRUE) {
             'Civil liberties','Political civil liberties','Private civil liberties',
             'Press freedom (RSF)','Obstacles to access (FH)','Limits on content (FH)',
             'Violations of user rights (FH)','Freedom on the net (FH)')
-  )
+  ) %>%
+    mutate(flip=grepl('\\(.*\\)',label))
+  flip_vars <- filter(rename_tbl,flip)$variable
+  # Need to use this instead of scale(), because scale returns a matrix and screws up dplyr
+  make_norm <- function(x) { 
+    (x - mean(x, na.rm=TRUE)) / sd(x, na.rm=TRUE)
+  }
   tmp <- left_join(vdem,fotn,by='country') %>%
     left_join(rsf,by='country') %>%
     left_join(read_csv('pc.csv'),by='country') %>%
-    mutate_at(2:26,scale) 
+    mutate_at(2:26,make_norm) %>%
+    mutate_at(flip_vars, function(x) -x)
 
   all_pred <- tmp %>%
     mutate_at(2:26,function(x) predict(lm(x ~ tmp$pc1 + tmp$pc2,na.action=na.exclude)))
@@ -94,6 +101,5 @@ censorship_plot('China') +
 # TODO: factor out so that I only need to pass in a rename_df to make plots for new variables
 # TODO: make some more versions of this...
 # TODO: different ordering option -- put highly-correlated indices close together
-# TODO: reverse ordering of some series so that high=good and low=bad
 # TODO: add shaded background to mark out central X%
 
