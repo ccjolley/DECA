@@ -11,7 +11,7 @@ source('fotn.R')
 source('rsf.R')
 # TODO: add other sources, especially FOTN and RSF
 
-censorship_plot <- function(country_name,show_pred=TRUE) {
+censorship_plot <- function(country_name,show_pred=TRUE,shade_fraction=NA) {
   rename_tbl <- tibble(
     variable=c('v2smgovfilcap','v2smgovfilprc','v2smgovshutcap','v2smgovshut',
                'v2smgovsm','v2smgovsmalt','v2smgovsmmon','v2smgovsmcenprc',
@@ -73,13 +73,42 @@ censorship_plot <- function(country_name,show_pred=TRUE) {
     left_join(pred,by=c('country','variable')) %>%
     mutate(sig = abs(value-pred) > ci)
  
-  p <- ggplot(plotme,aes(x=value,y=label,color=highlight)) +
-    geom_jitter(data=filter(plotme,!highlight),size=2,alpha=0.1,width=0,height=0.1) +
+  ## Set up plot canvas
+  p <- ggplot(plotme,aes(x=value,y=label,color=highlight)) 
+  ## Put gray box in the back if desired
+  if (!is.na(shade_fraction)) {
+    low_q <- (1-shade_fraction)/2
+    high_q <- 1-low
+    low_bound <- sapply(names(tmp)[2:26], function(x) {
+      tmp[,x] %>% as.data.frame %>% quantile(probs=low_q,na.rm=TRUE)
+    }) %>%
+      enframe %>%
+      mutate(name=sub('\\..*\\%','',name)) %>%
+      rename(variable=name,low=value)
+    high_bound <- sapply(names(tmp)[2:26], function(x) {
+      tmp[,x] %>% as.data.frame %>% quantile(probs=high_q,na.rm=TRUE)
+    }) %>%
+      enframe %>%
+      mutate(name=sub('\\..*\\%','',name)) %>%
+      rename(variable=name,high=value)
+    
+    add_boxes <- left_join(plotme,low_bound,by='variable') %>%
+      left_join(high_bound,by='variable') %>%
+      mutate(center=(low+high)/2,
+             width=(high-low))
+    p <- p + 
+      geom_tile(data=add_boxes,aes(x=center,y=label,width=width,height=0.9),fill='#CFCDC9',color=NA)
+  }  
+  ## Add dots for countries
+  p <- p +
+    geom_jitter(data=filter(plotme,!highlight),size=2,alpha=1,width=0,height=0.1,shape=1) +
+    #geom_jitter(data=filter(plotme,!highlight),size=2,alpha=0.1,width=0,height=0.1) +
     geom_point(data=filter(plotme,highlight),size=5) +
     theme_USAID + colors_USAID +
     theme(legend.position = 'none',
           axis.title=element_blank(),
           axis.text.x=element_blank())
+  ## Add prediction lines if desired
   if (show_pred) {
     p <- p + 
       geom_errorbarh(aes(xmin=pred,xmax=pred),size=1) +
@@ -91,15 +120,18 @@ censorship_plot <- function(country_name,show_pred=TRUE) {
 
 censorship_plot('Colombia') +
   ggtitle('Censorship, information integrity, and digital rights: Colombia')
-censorship_plot('Kenya',show_pred=FALSE)
+censorship_plot('Kenya') +
+  ggtitle('Censorship, information integrity, and digital rights: Kenya')
+censorship_plot('Kenya',show_pred=FALSE,shade_fraction=0.5) +
+  ggtitle('Censorship, information integrity, and digital rights: Kenya')
 censorship_plot('Nepal')
 censorship_plot('United States of America') 
 censorship_plot('China') +
   ggtitle('Censorship, information integrity, and digital rights: China')
 
 # TODO: what happens if I add in more PCs?
+# TODO: different ordering option -- put highly-correlated indices close together
 # TODO: factor out so that I only need to pass in a rename_df to make plots for new variables
 # TODO: make some more versions of this...
-# TODO: different ordering option -- put highly-correlated indices close together
-# TODO: add shaded background to mark out central X%
+
 
