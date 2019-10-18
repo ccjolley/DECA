@@ -11,7 +11,7 @@ source('fotn.R')
 source('rsf.R')
 # TODO: add other sources, especially FOTN and RSF
 
-censorship_plot <- function(country_name) {
+censorship_plot <- function(country_name,show_pred=TRUE) {
   rename_tbl <- tibble(
     variable=c('v2smgovfilcap','v2smgovfilprc','v2smgovshutcap','v2smgovshut',
                'v2smgovsm','v2smgovsmalt','v2smgovsmmon','v2smgovsmcenprc',
@@ -66,29 +66,34 @@ censorship_plot <- function(country_name) {
     left_join(pred,by=c('country','variable')) %>%
     mutate(sig = abs(value-pred) > ci)
  
-  ggplot(plotme,aes(x=value,y=label,color=highlight)) +
+  p <- ggplot(plotme,aes(x=value,y=label,color=highlight)) +
     geom_jitter(data=filter(plotme,!highlight),size=2,alpha=0.1,width=0,height=0.1) +
     geom_point(data=filter(plotme,highlight),size=5) +
-    geom_point(data=filter(plotme,highlight,!sig),size=3,color='#CFCDC9') +
-    geom_errorbarh(aes(xmin=pred,xmax=pred),size=1) +
-    geom_segment(aes(xend=pred,yend=label),size=1) +
     theme_USAID + colors_USAID +
     theme(legend.position = 'none',
           axis.title=element_blank(),
           axis.text.x=element_blank())
+  if (show_pred) {
+    p <- p + 
+      geom_errorbarh(aes(xmin=pred,xmax=pred),size=1) +
+      geom_segment(aes(xend=pred,yend=label),size=1) +
+      geom_point(data=filter(plotme,highlight,!sig),size=3,color='#CFCDC9') 
+  }
+  p
 }
 
 censorship_plot('Colombia') +
   ggtitle('Censorship, information integrity, and digital rights: Colombia')
-censorship_plot('Kenya')
+censorship_plot('Kenya',show_pred=FALSE)
 censorship_plot('Nepal')
 censorship_plot('United States of America') 
 censorship_plot('China') +
   ggtitle('Censorship, information integrity, and digital rights: China')
 
 # TODO: what happens if I add in more PCs?
-# TODO: add option to turn off prediction lines
-# TODO: put gray dot in front of line segment
 # TODO: factor out so that I only need to pass in a rename_df to make plots for new variables
 # TODO: make some more versions of this...
+# TODO: different ordering option -- put highly-correlated indices close together
+# TODO: reverse ordering of some series so that high=good and low=bad
+# TODO: add shaded background to mark out central X%
 
