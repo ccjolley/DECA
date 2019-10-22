@@ -100,6 +100,8 @@ j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
     cs <- corr_sort(select(tmp,-country,-starts_with('pc')))
     sorted_levels <- rename_tbl$label[match(cs,rename_tbl$variable)] %>% rev
     plotme <- mutate(plotme,label=factor(label,levels=sorted_levels))
+  } else if (sort_order=='none') {
+    plotme <- mutate(plotme,label=factor(label,levels=rev(rename_tbl$label)))
   }
   
   ## Set up plot canvas
