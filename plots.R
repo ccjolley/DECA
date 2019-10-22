@@ -90,5 +90,32 @@ censorship_plot <- function(country_name,show_pred=TRUE,shade_fraction=NA,
 
 censorship_plot('Colombia',shade_fraction=0.5,show_pred=FALSE,sort_order='cor')
 censorship_plot('Kenya',shade_fraction=0.5,show_pred=FALSE,sort_order='cor') 
+censorship_plot('China',shade_fraction=0.5,show_pred=FALSE,sort_order='cor') 
 
+###############################################################################
+# Digital society and governance
+###############################################################################
+data_society <- vdem %>%
+  select(country,starts_with('v2x_')) %>%
+  left_join(select(gsma,country,mci_content),by='country') %>%
+  left_join(select(wef,country,ict_laws,nri_enviro),by='country') %>%
+  left_join(read_csv('pc.csv'),by='country')
+  
+rename_society <- tibble(
+  variable=c('v2x_civlib','v2x_clpol','v2x_clpriv','mci_content','ict_laws','nri_enviro'),
+  label=c('Civil liberties (VDem)','Political civil liberties (VDem)',
+          'Private civil liberties (VDem)','Content & Services (GSMA)',
+          'Laws relating to ICTs (WEF)','Environment subindex (WEF)'),
+  flip=FALSE
+)
+
+society_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                        sort_order='cor') {
+  j2sr_style_plot(data_society,rename_society,country_name,show_pred,
+                  shade_fraction,sort_order) +
+    ggtitle(paste0('Digital society and governance: ',country_name))
+}
+
+society_plot('Kenya')
+society_plot('Colombia')
 

@@ -68,7 +68,7 @@ j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
   all_pred <- tmp %>%
     mutate_at(rename_tbl$variable,function(x) predict(lm(x ~ tmp$pc1 + tmp$pc2,na.action=na.exclude)))
   
-  ci <- sapply(names(tmp)[2:26], function(x) {
+  ci <- sapply(rename_tbl$variable, function(x) {
     (tmp[,x] - all_pred[,x]) %>%
       quantile(na.rm=TRUE,probs=c(0.025,0.975)) %>%
       abs %>% mean
@@ -108,13 +108,13 @@ j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
   if (!is.na(shade_fraction)) {
     low_q <- (1-shade_fraction)/2
     high_q <- 1-low_q
-    low_bound <- sapply(names(tmp)[2:26], function(x) {
+    low_bound <- sapply(rename_tbl$variable, function(x) {
       tmp[,x] %>% as.data.frame %>% quantile(probs=low_q,na.rm=TRUE)
     }) %>%
       enframe %>%
       mutate(name=sub('\\..*\\%','',name)) %>%
       rename(variable=name,low=value)
-    high_bound <- sapply(names(tmp)[2:26], function(x) {
+    high_bound <- sapply(rename_tbl$variable, function(x) {
       tmp[,x] %>% as.data.frame %>% quantile(probs=high_q,na.rm=TRUE)
     }) %>%
       enframe %>%
