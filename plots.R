@@ -50,6 +50,24 @@ access_plot('Kenya')
 access_plot('Colombia')
 
 ###############################################################################
+# Under Access & Use -- specific plot for digital literacy
+###############################################################################
+source('sdg4.R')
+
+# TODO: double-check these names
+rename_sdg4 <- tibble(
+  variable=setdiff(names(sdg4),'country)',
+  label=c('Copy/paste','Create presentation','Install software','Move files to a device',
+          'Move files to a folder','Install a new device','Sent email with attachment',
+          'Use spreadsheet','Write program','GG: Copy/paste','GG: Create presentation',
+          'GG: Install software','GG: Move files to device','GG: Move files to folder',
+          'GG: Install new device','GG: Sent email with attachment','GG: Use spreadsheet',
+          'GG: Write program')
+)
+
+# TODO: finish this
+
+###############################################################################
 # Censorship, information integrity, and digital rights
 ###############################################################################
 source('vdem.R')
