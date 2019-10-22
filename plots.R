@@ -56,16 +56,32 @@ source('sdg4.R')
 
 # TODO: double-check these names
 rename_sdg4 <- tibble(
-  variable=setdiff(names(sdg4),'country)',
+  variable=setdiff(names(sdg4),'country'),
   label=c('Copy/paste','Create presentation','Install software','Move files to a device',
           'Move files to a folder','Install a new device','Sent email with attachment',
           'Use spreadsheet','Write program','GG: Copy/paste','GG: Create presentation',
           'GG: Install software','GG: Move files to device','GG: Move files to folder',
           'GG: Install new device','GG: Sent email with attachment','GG: Use spreadsheet',
-          'GG: Write program')
+          'GG: Write program'),
+  flip=FALSE
 )
 
-# TODO: finish this
+data_dig_lit <- sdg4 %>%
+  left_join(read_csv('pc.csv'),by='country')
+
+# TODO: other digital literacy variables to include?
+dig_lit_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                         sort_order='none') {
+  j2sr_style_plot(data_dig_lit,rename_sdg4,country_name,show_pred,
+                  shade_fraction,sort_order) +
+    ggtitle(paste0('Digital literacy: ',country_name)) +
+    labs(caption='GG = Gender Gap')
+}
+  
+dig_lit_plot('Colombia')
+
+# TODO: in this case, since many are in comparable units, it might make sense 
+# to skip normalization
 
 ###############################################################################
 # Censorship, information integrity, and digital rights
