@@ -157,6 +157,57 @@ society_plot('Colombia')
 # Digital economy
 ###############################################################################
 
+###############################################################################
+# Infrastructure
+###############################################################################
+
+# TODO: does mmri_infra measure mobile infrastructure or financial infrastructure?
+# same goes for the EIU index
+# EIU: mostly concerned with financial infrastructure -- "connectivity" subcomponent
+# deals with things covered under A&U. they do have an indicator for digital ID, 
+# but it's only binary -- not very good. Can do better with ID4D. They have numbers
+# for 2G-4G connectivity; I should check to see if they line up with what I'm 
+# getting from GSMA.
+# MMRI: doesn't really deal with infrastructure in the same sense
+# MCI: has some sub-indices on network coverage, network performance, other enabling
+# infrastructure, and spectrum. I might need some help understand what the spectrum 
+# numbers mean.
+# TODO: go back to infrastructure notes to see what people had wanted to include there
+
+# TODO: what is a TLD?
+
+# TODO: how are TLDs and IXPs normalized?
+
+data_infra <- gsma %>%
+  select(country,mci_infra,starts_with('cov_'),servers,tlds,ixps) %>%
+  left_join(select(a4ai,country,infrastructure_a4ai))
+  
+rename_infra <- tibble(
+  variable=c("mci_infra","mci_infra_coverage","cov_2G","cov_3G","cov_4G",
+             "mci_infra_performance",'download','upload','latency',"mci_infra_enabling",'elect',
+             'bandwidth',"servers","tlds","ixps",
+             'mci_infra_spectrum','spectrum_dd','spectrum_low','spectrum_high'),
+  label=c('Infrastructure (MCI subindex)','Network coverage (MCI dimension)',
+          '2G coverage','3G coverage','4G coverage',
+          'Nework performance (MCI dimension)','Mobile download speed','Mobile upload speed','Mobile latency',
+          'Enabling infrastructure (MCI dimension)','Electricy access','Interational internet bandwidth',
+          'Secure internet servers','Top-level domains per capita','IXPs per capita','Spectrum (MCI dimension)',
+          'Digital dividend spectrum','Spectrum below 1 GHz','Spuctrum 1-3 GHz'),
+  flip=FALSE
+)
+
+infra_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                         sort_order='none') {
+  gsma %>%
+    select(country,one_of(rename_infra$variable)) %>%
+    left_join(read_csv('pc.csv'),by='country') %>%
+  j2sr_style_plot(rename_infra,country_name,show_pred,
+                 shade_fraction,sort_order) +
+    ggtitle(paste0('Infrastructure: ',country_name))
+}
+
+infra_plot('Kenya')
+infra_plot('Colombia')
   
 ###############################################################################
 # What hasn't been used yet?
