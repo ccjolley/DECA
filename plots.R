@@ -9,8 +9,6 @@ source('gsma.R')
 source('wef.R')
 source('a4ai.R')
 
-data_access <-  
-
 rename_access <- tibble(
   variable=c("mobile_subs","internet_users","fixed_internet","mobile_broadband",
              "nri_usage","mci_afford","mci_consumer",
@@ -107,8 +105,6 @@ rename_censor <- tibble(
 ) %>%
   mutate(flip=grepl('\\(.*\\)',label))
 
-data_censor <- 
-
 censorship_plot <- function(country_name,show_pred=TRUE,shade_fraction=NA,
                             sort_order='value') {
   left_join(vdem,fotn,by='country') %>%
@@ -151,6 +147,7 @@ society_plot('Colombia')
 # Digital economy -- there are a few of these
 ###############################################################################
 ### EIU Global Microscope
+source('eiu.R')
 # TODO: need text descriptions of what all these things are
 rename_eiu <- tibble(
   variable=c("gov_support","stability_integrity","products_outlets",
@@ -196,6 +193,7 @@ mmri_plot('Kenya')
 mmri_plot('Colombia')
 
 ### World Bank Findex
+source('wb.R')
 
 rename_barrier <- tibble(
   variable=c("barrier_fam","barrier_nodocs","barrier_nofunds","barrier_noneed",
