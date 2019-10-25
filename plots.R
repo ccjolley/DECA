@@ -9,28 +9,17 @@ source('gsma.R')
 source('wef.R')
 source('a4ai.R')
 
-data_access <- wef %>%
-  select(country,mobile_subs,internet_users,fixed_internet,mobile_broadband,
-         nri_usage) %>%
-  left_join(select(gsma,country,mci_afford,mci_consumer,cov_2G,cov_3G,cov_4G),
-            by='country') %>%
-  left_join(select(itu,country,fixed_bb,hh_mobile,hh_computer,hh_internet,
-                   ind_computer,ind_mobile,internet_gender_gap,ind_internet,
-                   mobile_cell,fixed_tel),by='country') %>%
-  left_join(select(a4ai,country,Cost_1_GB_Share_GNICM,access_a4ai,overall_a4ai),
-            by='country') %>%
-  left_join(read_csv('pc.csv'),by='country')
+data_access <-  
 
 rename_access <- tibble(
   variable=c("mobile_subs","internet_users","fixed_internet","mobile_broadband",
-             "nri_usage","mci_afford","mci_consumer","cov_2G","cov_3G","cov_4G",
+             "nri_usage","mci_afford","mci_consumer",
              "fixed_bb","hh_mobile","hh_computer","hh_internet","ind_computer",
              "ind_mobile","internet_gender_gap","ind_internet","mobile_cell","fixed_tel",
              "Cost_1_GB_Share_GNICM","access_a4ai","overall_a4ai"),
     label=c('Mobile subscriptions (WEF)','Internet users (WEF)','Fixed internet subscriptions (WEF)',
             'Mobile broadband subscriptions (WEF)','ICT Use (J2SR/WEF)','Affordability (GSMA)',
-            'Consumer readiness (GSMA)','2G coverage (GSMA)','3G coverage (GSMA)',
-            '4G coverage (GSMA)','Fixed broadband subscriptions (ITU)',
+            'Consumer readiness (GSMA)','Fixed broadband subscriptions (ITU)',
             'HH mobile ownership (ITU)','HH computer ownership (ITU)','HH internet use (ITU)',
             'Individual computer use (ITU)','Individual mobile use (ITU)',
             'Gender gap in internet use (ITU)','Individual internet use (ITU)',
@@ -41,9 +30,19 @@ rename_access <- tibble(
 
 access_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                             sort_order='cor') {
-  j2sr_style_plot(data_access,rename_access,country_name,show_pred,
-                  shade_fraction,sort_order) +
-    ggtitle(paste0('Access and use: ',country_name))
+  wef %>%
+    select(country,mobile_subs,internet_users,fixed_internet,mobile_broadband,
+           nri_usage) %>%
+    left_join(select(gsma,country,mci_afford,mci_consumer),
+              by='country') %>%
+    left_join(select(itu,country,fixed_bb,hh_mobile,hh_computer,hh_internet,
+                     ind_computer,ind_mobile,internet_gender_gap,ind_internet,
+                     mobile_cell,fixed_tel),by='country') %>%
+    left_join(select(a4ai,country,Cost_1_GB_Share_GNICM,access_a4ai,overall_a4ai),
+              by='country') %>%
+    j2sr_style_plot(rename_access,country_name,show_pred,
+                    shade_fraction,sort_order) +
+      ggtitle(paste0('Access and use: ',country_name))
 }
 
 access_plot('Kenya')
@@ -66,13 +65,10 @@ rename_sdg4 <- tibble(
   flip=FALSE
 )
 
-data_dig_lit <- sdg4 %>%
-  left_join(read_csv('pc.csv'),by='country')
-
 # TODO: other digital literacy variables to include?
 dig_lit_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                          sort_order='none') {
-  j2sr_style_plot(data_dig_lit,rename_sdg4,country_name,show_pred,
+  j2sr_style_plot(sdg4,rename_sdg4,country_name,show_pred,
                   shade_fraction,sort_order) +
     ggtitle(paste0('Digital literacy: ',country_name)) +
     labs(caption='GG = Gender Gap')
@@ -111,15 +107,15 @@ rename_censor <- tibble(
 ) %>%
   mutate(flip=grepl('\\(.*\\)',label))
 
-data_censor <- left_join(vdem,fotn,by='country') %>%
-  left_join(rsf,by='country') %>%
-  left_join(read_csv('pc.csv'),by='country')
+data_censor <- 
 
 censorship_plot <- function(country_name,show_pred=TRUE,shade_fraction=NA,
                             sort_order='value') {
-  j2sr_style_plot(data_censor,rename_censor,country_name,show_pred,
-                  shade_fraction,sort_order) +
-    ggtitle(paste0('Censorship, information integrity, and digital rights: ',country_name))
+  left_join(vdem,fotn,by='country') %>%
+    left_join(rsf,by='country') %>%
+    j2sr_style_plot(rename_censor,country_name,show_pred,
+                    shade_fraction,sort_order) +
+      ggtitle(paste0('Censorship, information integrity, and digital rights: ',country_name))
 }
 
 censorship_plot('Colombia',shade_fraction=0.5,show_pred=FALSE,sort_order='cor')
@@ -129,12 +125,6 @@ censorship_plot('China',shade_fraction=0.5,show_pred=FALSE,sort_order='cor')
 ###############################################################################
 # Digital society and governance
 ###############################################################################
-data_society <- vdem %>%
-  select(country,starts_with('v2x_')) %>%
-  left_join(select(gsma,country,mci_content),by='country') %>%
-  left_join(select(wef,country,ict_laws,nri_enviro),by='country') %>%
-  left_join(read_csv('pc.csv'),by='country')
-  
 rename_society <- tibble(
   variable=c('v2x_civlib','v2x_clpol','v2x_clpriv','mci_content','ict_laws','nri_enviro'),
   label=c('Civil liberties (VDem)','Political civil liberties (VDem)',
@@ -145,8 +135,12 @@ rename_society <- tibble(
 
 society_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                         sort_order='cor') {
-  j2sr_style_plot(data_society,rename_society,country_name,show_pred,
-                  shade_fraction,sort_order) +
+  vdem %>%
+    select(country,starts_with('v2x_')) %>%
+    left_join(select(gsma,country,mci_content),by='country') %>%
+    left_join(select(wef,country,ict_laws,nri_enviro),by='country')  %>%
+    j2sr_style_plot(rename_society,country_name,show_pred,
+                    shade_fraction,sort_order) +
     ggtitle(paste0('Digital society and governance: ',country_name))
 }
 
@@ -168,8 +162,7 @@ rename_eiu <- tibble(
 
 eiu_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                      sort_order='cor') {
-  left_join(eiu,read_csv('pc.csv'),by='country') %>%
-    j2sr_style_plot(rename_eiu,country_name,show_pred,
+  j2sr_style_plot(eiu,rename_eiu,country_name,show_pred,
                     shade_fraction,sort_order) +
     ggtitle(paste0('EIU Global Microscope: ',country_name))
 }
@@ -181,8 +174,6 @@ eiu_plot('Kenya')
 eiu_plot('Colombia') 
 
 ### GSMA Mobile Money Regulation Index
-data_mmri <- select(gsma,country,starts_with('mmri')) %>%
-  left_join(read_csv('pc.csv'),by='country')
 
 # TODO: double-check names of these variables, write a text description of each
 
@@ -195,8 +186,9 @@ rename_mmri <- tibble(
 
 mmri_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                       sort_order='cor') {
-  j2sr_style_plot(data_mmri,rename_mmri,country_name,show_pred,
-                  shade_fraction,sort_order) +
+  select(gsma,country,starts_with('mmri')) %>%
+    j2sr_style_plot(rename_mmri,country_name,show_pred,
+                    shade_fraction,sort_order) +
     ggtitle(paste0('GSMA Mobile Money Regulation Index: ',country_name))
 }
 
@@ -217,7 +209,6 @@ barrier_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                          sort_order='cor') {
   wb %>%
     select(country,starts_with('barrier')) %>%
-    left_join(read_csv('pc.csv'),by='country') %>%
     j2sr_style_plot(rename_barrier,country_name,show_pred,
                     shade_fraction,sort_order) +
     ggtitle(paste0('Findex barriers to access: ',country_name))
@@ -249,7 +240,6 @@ econ_gaps_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                            sort_order='none') {
   wb %>%
     select(country,one_of(rename_econ_gaps$variable)) %>%
-    left_join(read_csv('pc.csv')) %>%
     j2sr_style_plot(rename_econ_gaps,country_name,show_pred,
                     shade_fraction,sort_order) +
     ggtitle(paste0('Findex access gaps: ',country_name))
@@ -275,14 +265,6 @@ econ_gaps_plot('Colombia')
 # numbers mean.
 # TODO: go back to infrastructure notes to see what people had wanted to include there
 
-# TODO: what is a TLD?
-
-# TODO: how are TLDs and IXPs normalized?
-
-data_infra <- gsma %>%
-  select(country,mci_infra,starts_with('cov_'),servers,tlds,ixps) %>%
-  left_join(select(a4ai,country,infrastructure_a4ai))
-  
 rename_infra <- tibble(
   variable=c("mci_infra","mci_infra_coverage","cov_2G","cov_3G","cov_4G",
              "mci_infra_performance",'download','upload','latency',"mci_infra_enabling",'elect',
@@ -301,7 +283,6 @@ infra_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                          sort_order='none') {
   gsma %>%
     select(country,one_of(rename_infra$variable)) %>%
-    left_join(read_csv('pc.csv'),by='country') %>%
   j2sr_style_plot(rename_infra,country_name,show_pred,
                  shade_fraction,sort_order) +
     ggtitle(paste0('Infrastructure: ',country_name))

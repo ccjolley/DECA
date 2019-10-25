@@ -63,7 +63,8 @@ j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
   
   tmp <- data  %>%
     mutate_at(rename_tbl$variable,make_norm) %>%
-    mutate_at(flip_vars, function(x) -x)
+    mutate_at(flip_vars, function(x) -x) %>%
+    left_join(read_csv('pc.csv'),by='country')
   
   all_pred <- tmp %>%
     mutate_at(rename_tbl$variable,function(x) predict(lm(x ~ tmp$pc1 + tmp$pc2,na.action=na.exclude)))
