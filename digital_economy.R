@@ -219,8 +219,6 @@ eiu_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 # TODO: join PCs to data frame inside the j2sr_style_plot() function, instead
 # of doing it everywhere else
 
-# TODO: maybe combine this with MMRI?
-
 eiu_plot('Kenya')
 eiu_plot('Colombia') 
 

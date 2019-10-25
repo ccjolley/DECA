@@ -154,8 +154,109 @@ society_plot('Kenya')
 society_plot('Colombia')
 
 ###############################################################################
-# Digital economy
+# Digital economy -- there are a few of these
 ###############################################################################
+### EIU Global Microscope
+# TODO: need text descriptions of what all these things are
+rename_eiu <- tibble(
+  variable=c("gov_support","stability_integrity","products_outlets",
+             "consumer_protection","infrastructure_eiu","overall_eiu"),
+  label=c('Government support','Stability/integrity','Products and outlets',
+          'Consumer protection','Infrastructure','EIU overall'),
+  flip=FALSE
+)
+
+eiu_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                     sort_order='cor') {
+  left_join(eiu,read_csv('pc.csv'),by='country') %>%
+    j2sr_style_plot(rename_eiu,country_name,show_pred,
+                    shade_fraction,sort_order) +
+    ggtitle(paste0('EIU Global Microscope: ',country_name))
+}
+
+# TODO: join PCs to data frame inside the j2sr_style_plot() function, instead
+# of doing it everywhere else
+
+eiu_plot('Kenya')
+eiu_plot('Colombia') 
+
+### GSMA Mobile Money Regulation Index
+data_mmri <- select(gsma,country,starts_with('mmri')) %>%
+  left_join(read_csv('pc.csv'),by='country')
+
+# TODO: double-check names of these variables, write a text description of each
+
+rename_mmri <- tibble(
+  variable=c("mmri","mmri_auth","mmri_consumer","mmri_transact","mmri_kyc",
+             "mmri_agent","mmri_infra"),
+  label=c('MMRI','Authorization','Consumer...','Transactinons','KYC','Agent network','Infrastructure'),
+  flip=FALSE
+)
+
+mmri_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                      sort_order='cor') {
+  j2sr_style_plot(data_mmri,rename_mmri,country_name,show_pred,
+                  shade_fraction,sort_order) +
+    ggtitle(paste0('GSMA Mobile Money Regulation Index: ',country_name))
+}
+
+mmri_plot('Kenya')
+mmri_plot('Colombia')
+
+### World Bank Findex
+
+rename_barrier <- tibble(
+  variable=c("barrier_fam","barrier_nodocs","barrier_nofunds","barrier_noneed",
+             "barrier_relig","barrier_tooexpens","barrier_toofar","barrier_trust"),
+  label=c('Family','No documents','No funds','No need','Religion','Too expensive',
+          'Too far away','Lack of trust'),
+  flip=FALSE
+)
+
+barrier_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                         sort_order='cor') {
+  wb %>%
+    select(country,starts_with('barrier')) %>%
+    left_join(read_csv('pc.csv'),by='country') %>%
+    j2sr_style_plot(rename_barrier,country_name,show_pred,
+                    shade_fraction,sort_order) +
+    ggtitle(paste0('Findex barriers to access: ',country_name))
+}
+
+barrier_plot('Colombia')
+barrier_plot('Kenya')
+
+rename_econ_gaps <- tibble(
+  variable=c("acct","borrow","dig_pay","mm","acct_gender_gap",
+             "borrow_gender_gap","dig_pay_gender_gap",'mm_gender_gap',"acct_wealth_gap",
+             "borrow_wealth_gap","dig_pay_wealth_gap",'mm_wealth_gap',"acct_age_gap",
+             "borrow_age_gap","dig_pay_age_gap",'mm_age_gap',"acct_ed_gap","borrow_ed_gap",
+             "dig_pay_ed_gap",'mm_ed_gap',"acct_rural_gap","borrow_rural_gap",
+             "dig_pay_rural_gap",'mm_rural_gap'),
+  label=c('Account ownership','Borrowed','Used digital payments','Mobile money',
+          'Account gender gap',
+          'Borrowing gender gap','Digital payments gender gap','Mobile money gender gap',
+          'Account wealth gap',
+          'Borrowing wealth gap','Digital payments wealth gap','Mobile money wealth gap','Account age gap',
+          'Borrowing age gap','Digital payments age gap','Mobile money age gap','Account education gap',
+          'Borrowing education gap','Digital payments education gap','Mobile money education gap',
+          'Account rural/urban gap','Borrowing rural/urban gap',
+          'Digital payments urban/rural gap','Mobile money urban/rural gap'),
+  flip=FALSE
+)
+
+econ_gaps_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                           sort_order='none') {
+  wb %>%
+    select(country,one_of(rename_econ_gaps$variable)) %>%
+    left_join(read_csv('pc.csv')) %>%
+    j2sr_style_plot(rename_econ_gaps,country_name,show_pred,
+                    shade_fraction,sort_order) +
+    ggtitle(paste0('Findex access gaps: ',country_name))
+}
+
+econ_gaps_plot('Kenya')
+econ_gaps_plot('Colombia')
 
 ###############################################################################
 # Infrastructure
