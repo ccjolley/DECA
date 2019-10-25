@@ -164,9 +164,6 @@ eiu_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
     ggtitle(paste0('EIU Global Microscope: ',country_name))
 }
 
-# TODO: join PCs to data frame inside the j2sr_style_plot() function, instead
-# of doing it everywhere else
-
 eiu_plot('Kenya')
 eiu_plot('Colombia') 
 
@@ -246,12 +243,12 @@ econ_gaps_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 econ_gaps_plot('Kenya')
 econ_gaps_plot('Colombia')
 
+### TODO: I don't yet have anything that visualizes the IMF data.
+
 ###############################################################################
 # Infrastructure
 ###############################################################################
 
-# TODO: does mmri_infra measure mobile infrastructure or financial infrastructure?
-# same goes for the EIU index
 # EIU: mostly concerned with financial infrastructure -- "connectivity" subcomponent
 # deals with things covered under A&U. they do have an indicator for digital ID, 
 # but it's only binary -- not very good. Can do better with ID4D. They have numbers

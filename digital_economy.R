@@ -13,10 +13,6 @@ data_econ <- gsma %>%
 ###############################################################################
 # OK... so this is 152 variables. I need a way to pare this down...
 ###############################################################################
-# TODO: some of the IMF variables report male and female separately; these
-# could be recast as gender-gap variables, as long as there's a population-avg
-# as well.
-
 # What do the variable counts look like for countries I'm interested in?
 data_econ %>% filter(country=='Kenya') %>% melt %>% filter(!is.na(value)) %>% nrow
 # 65 for Kenya
@@ -49,8 +45,6 @@ country_subset <- function(data,cname) {
 }
 
 ### If two columns are highly correlated, remove the one with more NAs
-# TODO: better to parameterize this with a number of variables, rather
-# than a correlation threshold.
 cor_select <- function(d,thresh) {
   # TODO: code duplicated from cor_sort; factor out if I need it a third time
   all_cor <- d %>% select(-country) %>%
@@ -197,8 +191,6 @@ var_select_plot(4,0.8)
 var_select_plot(5,0.9)
 # employment gaps
 
-# TODO: build out plots for EIU and MMRI indices, similar to the Findex ones
-
 # TODO: need text descriptions of what all these things are
 rename_eiu <- tibble(
   variable=c("gov_support","stability_integrity","products_outlets",
@@ -215,9 +207,6 @@ eiu_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                     shade_fraction,sort_order) +
       ggtitle(paste0('EIU Global Microscope: ',country_name))
 }
-
-# TODO: join PCs to data frame inside the j2sr_style_plot() function, instead
-# of doing it everywhere else
 
 eiu_plot('Kenya')
 eiu_plot('Colombia') 

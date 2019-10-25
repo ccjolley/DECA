@@ -185,8 +185,6 @@ wb_findex <- read_excel('data/Global Findex Database.xlsx',sheet=1) %>%
          -ends_with('_labor'),-ends_with('_nolabor'),-ends_with('_old'),-ends_with('_young'),
          -ends_with('_ed'),-ends_with('_uned'),-ends_with('_rural'))
 
-# TODO: calculate gap scores, remove subpopulations
-
 wb <- full_join(wb_gpss_A,wb_gpss_B,by='country') %>%
   full_join(wb_gpss_C,by='country') %>%
   full_join(wb_findex,by='country')

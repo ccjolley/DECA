@@ -1,5 +1,6 @@
 library(tidyverse)
 library(haven)
+# source('utils.R')
 
 imf_all <- read_dta('data/IMF_financial_access_survey.dta')
 
@@ -10,6 +11,16 @@ imf <- imf_all %>%
   select(economy,ends_with('pop'),ends_with('pop_M'),ends_with('pop_F')) %>%
   rename(country=economy) %>%
   fix_adm0
+
+grep('_M',names(imf),value=TRUE)
+imf <- imf %>%
+  mutate(i_depositors_A1_hhs_gendergap = (i_depositors_A1_hhs_pop_M - i_depositors_A1_hhs_pop_F)/i_depositors_A1_hhs_pop_M,
+         i_deposit_acc_A1_hhs_gendergap = (i_deposit_acc_A1_hhs_pop_M - i_deposit_acc_A1_hhs_pop_F)/i_deposit_acc_A1_hhs_pop_M,
+         i_borrowers_A1_hhs_gendergap = (i_borrowers_A1_hhs_pop_M - i_borrowers_A1_hhs_pop_F) / i_borrowers_A1_hhs_pop_M,
+         i_borrowers_A3B1a_gendergap = (i_borrowers_A3B1a_pop_M - i_borrowers_A3B1a_pop_F) / i_borrowers_A3B1a_pop_M,
+         i_loan_acc_A1_hhs_gendergap = (i_loan_acc_A1_hhs_pop_M - i_loan_acc_A1_hhs_pop_F) / i_loan_acc_A1_hhs_pop_M,
+         i_acc_loan_A3B1a_gendergap = (i_acc_loan_A3B1a_pop_M - i_acc_loan_A3B1a_pop_F) / i_acc_loan_A3B1a_pop_M) %>%
+  select(-ends_with('_M'),-ends_with('_F'))
 
 is.na(imf) %>%
   colMeans %>%
