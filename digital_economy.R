@@ -46,7 +46,6 @@ country_subset <- function(data,cname) {
 
 ### If two columns are highly correlated, remove the one with more NAs
 cor_select <- function(d,thresh) {
-  # TODO: code duplicated from cor_sort; factor out if I need it a third time
   all_cor <- d %>% select(-country) %>%
     as.matrix %>%
     cor(use='pairwise.complete.obs') %>%
@@ -97,7 +96,6 @@ j2sr_style_plot(kenya_subset,rename_none,'Kenya',show_pred=FALSE,shade_fraction=
 # correlate strongly with PCs and have high coverage in USAID countries. Aim to get 2-3
 # for each of the first 5 of so PCs.
 ################################################################################
-# TODO: copied from pca.R -- maybe move it to utils.R
 # remove columns that are NA for too many USAID countries
 trim_columns <- function(df,frac,keep_list=NULL) {
   # if no keep_list provided, include all countries
@@ -191,7 +189,6 @@ var_select_plot(4,0.8)
 var_select_plot(5,0.9)
 # employment gaps
 
-# TODO: need text descriptions of what all these things are
 rename_eiu <- tibble(
   variable=c("gov_support","stability_integrity","products_outlets",
              "consumer_protection","infrastructure_eiu","overall_eiu"),
@@ -213,8 +210,6 @@ eiu_plot('Colombia')
 
 data_mmri <- select(gsma,country,starts_with('mmri')) %>%
   left_join(read_csv('pc.csv'),by='country')
-
-# TODO: double-check names of these variables, write a text description of each
 
 rename_mmri <- tibble(
   variable=c("mmri","mmri_auth","mmri_consumer","mmri_transact","mmri_kyc",
