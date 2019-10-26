@@ -147,14 +147,20 @@ society_plot('Colombia')
 ###############################################################################
 ### EIU Global Microscope
 source('eiu.R')
-# TODO: need text descriptions of what all these things are
 rename_eiu <- tibble(
   variable=c("gov_support","stability_integrity","products_outlets",
              "consumer_protection","infrastructure_eiu","overall_eiu"),
-  label=c('Government support','Stability/integrity','Products and outlets',
+  label=c('Government and policy support','Stability and integrity','Products and outlets',
           'Consumer protection','Infrastructure','EIU overall'),
   flip=FALSE
 )
+
+# TODO: move these descriptions into a Google doc
+# Government and policy support -- includes financial inclusion strategies, promotion of financial literacy, incentives for digitization and emerging technologies
+# Stability and integrity -- includes market entry restrictions and ongoing requirements for various financial institutions, customer due diligence, supervisory capacity of regulators, commitment to cybersecurity
+# Products and outlets -- features of accounts (opening requirements, deposit insurance, etc.), credit for low-income customers, fintech regulations, inclusive insurance, services offered by financial outlets
+# Consumer protection -- consumer rights for financial and insurance customers, cybercrime legal protection
+# Infrastructure -- payments (ATM, POS, etc.), Digital ID system, connectivity, credit information
 
 eiu_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                      sort_order='cor',num_pcs=5) {
