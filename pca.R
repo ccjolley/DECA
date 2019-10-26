@@ -44,7 +44,7 @@ qplot(x,y) # try 0.75 for now
 
 all_trim1 <- trim_columns(all,0.75,usaid_countries)
 c(ncol(all),ncol(all_trim1))
-# takes us from 244 columns to 80
+# takes us from 250 columns to 92
 
 ###############################################################################
 # Function that removes non-USAID countries for which more than a given 
@@ -81,7 +81,8 @@ imputed <- mice::complete(all_imp,1)
 pr <- prcomp(imputed,center=TRUE,scale=TRUE)
 plot(pr) 
 summary(pr)
-# As we'd hope, lots of variation in the first PC; about 50% in the first two
+# As we'd hope, lots of variation in the first PC; about 46% in the first two
+# need 30 PCs to cover 90% of variance
 
 f <- 0.03
 plotme <- tibble(country=all_trim2$country,
@@ -98,6 +99,7 @@ plotme <- tibble(country=all_trim2$country,
 
 ggplot(plotme,aes(x=pc1,y=pc2,color=color,label=label)) +
   geom_point(size=1) +
+  geom_point(data=filter(plotme,highlight),size=3,shape=1) +
   theme_USAID + colors_USAID +
   theme(legend.position = 'none') +
   geom_text_repel() +
@@ -106,14 +108,24 @@ ggplot(plotme,aes(x=pc1,y=pc2,color=color,label=label)) +
 
 pc1_cor <- sapply(setdiff(names(all_trim2),'country'),
        function(x) cor(all_trim2[,x],plotme$pc1,use='complete.obs')) %>%
-  sort()
-# Strongest correlations with Networked Readiness Index, Mobile Connectivity Index,
+  sort(decr=TRUE)
+head(pc1_cor)
+tail(pc1_cor)
+# Strongest correlations with Networked Readiness Index, Mobile Connectivity Index, 
+# infrastructure and adoption measures
 # anti-correlations with various findex access gaps
 
 pc2_cor <- sapply(setdiff(names(all_trim2),'country'),
                   function(x) cor(all_trim2[,x],plotme$pc2,use='complete.obs')) %>%
-  sort()
-# Strongest correlations with press freedom and government filtering capacity
+  sort(decr=TRUE)
+head(pc2_cor)
+tail(pc2_cor)
+# Strongest correlations with civil liberties and government filtering in practice
+
+cbind(select(all_trim2,country),
+      as_tibble(pr$x[,1:30])) %>%
+  write_csv('pc.csv')
+
 
 plotme %>%
   select(country,pc1,pc2) %>%

@@ -51,10 +51,9 @@ corr_sort <- function(d) {
 #                used in the plot), and "flip" (TRUE if the direction of the 
 #                variable should be inverted so that low=bad and high=good, 
 #                FALSE if it can be left as-is).
-# TODO: what happens if I add in more PCs?
 ###############################################################################
 j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
-                            shade_fraction=NA,sort_order='value') {
+                            shade_fraction=NA,sort_order='value',num_pcs=2) {
   flip_vars <- filter(rename_tbl,flip)$variable
   # Need to use this instead of scale(), because scale returns a matrix and screws up dplyr
   make_norm <- function(x) { 
@@ -63,27 +62,9 @@ j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
   
   tmp <- data  %>%
     mutate_at(rename_tbl$variable,make_norm) %>%
-    mutate_at(flip_vars, function(x) -x) %>%
-    left_join(read_csv('pc.csv'),by='country')
-  
-  all_pred <- tmp %>%
-    mutate_at(rename_tbl$variable,function(x) predict(lm(x ~ tmp$pc1 + tmp$pc2,na.action=na.exclude)))
-  
-  ci <- sapply(rename_tbl$variable, function(x) {
-    (tmp[,x] - all_pred[,x]) %>%
-      quantile(na.rm=TRUE,probs=c(0.025,0.975)) %>%
-      abs %>% mean
-  }) %>%
-    enframe %>%
-    rename(variable=name,ci=value)
-  pred <- all_pred %>%
-    filter(country==country_name) %>%
-    melt %>%
-    rename(pred=value) %>%
-    left_join(ci,by='variable')
+    mutate_at(flip_vars, function(x) -x) 
   
   plotme <- tmp %>%
-    select(-pc1,-pc2) %>%
     melt %>%
     mutate(highlight=(country==country_name)) %>%
     left_join(rename_tbl,by='variable') %>%
@@ -91,9 +72,32 @@ j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
     arrange(!highlight) %>%
     mutate(highlight_val=first(value)) %>%
     ungroup %>%
-    filter(!is.na(highlight_val)) %>%
-    left_join(pred,by=c('country','variable')) %>%
-    mutate(sig = abs(value-pred) > ci)
+    filter(!is.na(highlight_val)) 
+  if (show_pred) {
+    tmp <- tmp %>% 
+      left_join(read_csv('pc.csv'),by='country')
+    all_pred <- tmp %>%
+      mutate_at(rename_tbl$variable,function(x) {
+        f <- formula(paste0('x ~ ',paste0('tmp$PC',1:num_pcs,collapse=' + ')))
+        predict(lm(f,data=tmp,na.action=na.exclude))
+        })
+    
+    ci <- sapply(rename_tbl$variable, function(x) {
+      (tmp[,x] - all_pred[,x]) %>%
+        quantile(na.rm=TRUE,probs=c(0.025,0.975)) %>%
+        abs %>% mean
+    }) %>%
+      enframe %>%
+      rename(variable=name,ci=value)
+    pred <- all_pred %>%
+      filter(country==country_name) %>%
+      melt %>%
+      rename(pred=value) %>%
+      left_join(ci,by='variable')
+    plotme <- plotme %>%
+      left_join(pred,by=c('country','variable')) %>%
+      mutate(sig = abs(value-pred) > ci)
+  }
   
   if (sort_order=='value') {
     plotme <- mutate(plotme,label=fct_reorder(label,highlight_val))

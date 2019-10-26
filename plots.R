@@ -27,7 +27,7 @@ rename_access <- tibble(
   mutate(flip=(variable %in% c('Cost_1_GB_Share_GNICM','internet_gender_gap')))
 
 access_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                            sort_order='cor') {
+                            sort_order='cor',num_pcs=5) {
   wef %>%
     select(country,mobile_subs,internet_users,fixed_internet,mobile_broadband,
            nri_usage) %>%
@@ -39,7 +39,7 @@ access_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
     left_join(select(a4ai,country,Cost_1_GB_Share_GNICM,access_a4ai,overall_a4ai),
               by='country') %>%
     j2sr_style_plot(rename_access,country_name,show_pred,
-                    shade_fraction,sort_order) +
+                    shade_fraction,sort_order,num_pcs) +
       ggtitle(paste0('Access and use: ',country_name))
 }
 
@@ -65,9 +65,9 @@ rename_sdg4 <- tibble(
 
 # TODO: other digital literacy variables to include?
 dig_lit_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                         sort_order='none') {
+                         sort_order='none',num_pcs=5) {
   j2sr_style_plot(sdg4,rename_sdg4,country_name,show_pred,
-                  shade_fraction,sort_order) +
+                  shade_fraction,sort_order,num_pcs) +
     ggtitle(paste0('Digital literacy: ',country_name)) +
     labs(caption='GG = Gender Gap')
 }
@@ -106,11 +106,11 @@ rename_censor <- tibble(
   mutate(flip=grepl('\\(.*\\)',label))
 
 censorship_plot <- function(country_name,show_pred=TRUE,shade_fraction=NA,
-                            sort_order='value') {
+                            sort_order='value',num_pcs=5) {
   left_join(vdem,fotn,by='country') %>%
     left_join(rsf,by='country') %>%
     j2sr_style_plot(rename_censor,country_name,show_pred,
-                    shade_fraction,sort_order) +
+                    shade_fraction,sort_order,num_pcs) +
       ggtitle(paste0('Censorship, information integrity, and digital rights: ',country_name))
 }
 
@@ -130,13 +130,13 @@ rename_society <- tibble(
 )
 
 society_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                        sort_order='cor') {
+                        sort_order='cor',num_pcs=5) {
   vdem %>%
     select(country,starts_with('v2x_')) %>%
     left_join(select(gsma,country,mci_content),by='country') %>%
     left_join(select(wef,country,ict_laws,nri_enviro),by='country')  %>%
     j2sr_style_plot(rename_society,country_name,show_pred,
-                    shade_fraction,sort_order) +
+                    shade_fraction,sort_order,num_pcs) +
     ggtitle(paste0('Digital society and governance: ',country_name))
 }
 
@@ -158,9 +158,9 @@ rename_eiu <- tibble(
 )
 
 eiu_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                     sort_order='cor') {
+                     sort_order='cor',num_pcs=5) {
   j2sr_style_plot(eiu,rename_eiu,country_name,show_pred,
-                    shade_fraction,sort_order) +
+                    shade_fraction,sort_order,num_pcs) +
     ggtitle(paste0('EIU Global Microscope: ',country_name))
 }
 
@@ -179,10 +179,10 @@ rename_mmri <- tibble(
 )
 
 mmri_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                      sort_order='cor') {
+                      sort_order='cor',num_pcs=5) {
   select(gsma,country,starts_with('mmri')) %>%
     j2sr_style_plot(rename_mmri,country_name,show_pred,
-                    shade_fraction,sort_order) +
+                    shade_fraction,sort_order,num_pcs) +
     ggtitle(paste0('GSMA Mobile Money Regulation Index: ',country_name))
 }
 
@@ -201,11 +201,11 @@ rename_barrier <- tibble(
 )
 
 barrier_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                         sort_order='cor') {
+                         sort_order='cor',num_pcs=5) {
   wb %>%
     select(country,starts_with('barrier')) %>%
     j2sr_style_plot(rename_barrier,country_name,show_pred,
-                    shade_fraction,sort_order) +
+                    shade_fraction,sort_order,num_pcs) +
     ggtitle(paste0('Findex barriers to access: ',country_name))
 }
 
@@ -232,11 +232,11 @@ rename_econ_gaps <- tibble(
 )
 
 econ_gaps_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                           sort_order='none') {
+                           sort_order='none',num_pcs=5) {
   wb %>%
     select(country,one_of(rename_econ_gaps$variable)) %>%
     j2sr_style_plot(rename_econ_gaps,country_name,show_pred,
-                    shade_fraction,sort_order) +
+                    shade_fraction,sort_order,num_pcs) +
     ggtitle(paste0('Findex access gaps: ',country_name))
 }
 
@@ -275,11 +275,11 @@ rename_infra <- tibble(
 )
 
 infra_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                         sort_order='none') {
+                         sort_order='none',num_pcs=5) {
   gsma %>%
     select(country,one_of(rename_infra$variable)) %>%
   j2sr_style_plot(rename_infra,country_name,show_pred,
-                 shade_fraction,sort_order) +
+                 shade_fraction,sort_order,num_pcs) +
     ggtitle(paste0('Infrastructure: ',country_name))
 }
 
