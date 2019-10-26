@@ -51,13 +51,12 @@ access_plot('Colombia')
 ###############################################################################
 source('sdg4.R')
 
-# TODO: double-check these names
 rename_sdg4 <- tibble(
   variable=setdiff(names(sdg4),'country'),
   label=c('Copy/paste','Create presentation','Install software','Move files to a device',
-          'Move files to a folder','Install a new device','Sent email with attachment',
+          'Copy/move file or folder','Install a new device','Sent email with attachment',
           'Use spreadsheet','Write program','GG: Copy/paste','GG: Create presentation',
-          'GG: Install software','GG: Move files to device','GG: Move files to folder',
+          'GG: Install software','GG: Move files to device','GG: Copy/move file or folder',
           'GG: Install new device','GG: Sent email with attachment','GG: Use spreadsheet',
           'GG: Write program'),
   flip=FALSE
@@ -174,7 +173,8 @@ eiu_plot('Colombia')
 rename_mmri <- tibble(
   variable=c("mmri","mmri_auth","mmri_consumer","mmri_transact","mmri_kyc",
              "mmri_agent","mmri_infra"),
-  label=c('MMRI','Authorization','Consumer...','Transactinons','KYC','Agent network','Infrastructure'),
+  label=c('MMRI','Authorization','Consumer Protection','Transaction Limits',
+          'KYC','Agent network','Infrastructure and investment environment'),
   flip=FALSE
 )
 
@@ -183,7 +183,7 @@ mmri_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
   select(gsma,country,starts_with('mmri')) %>%
     j2sr_style_plot(rename_mmri,country_name,show_pred,
                     shade_fraction,sort_order,num_pcs) +
-    ggtitle(paste0('GSMA Mobile Money Regulation Index: ',country_name))
+    ggtitle(paste0('GSMA Mobile Money Regulatory Index: ',country_name))
 }
 
 mmri_plot('Kenya')
