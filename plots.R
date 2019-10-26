@@ -169,12 +169,10 @@ eiu_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
     ggtitle(paste0('EIU Global Microscope: ',country_name))
 }
 
-eiu_plot('Kenya')
-eiu_plot('Colombia') 
+eiu_plot('Kenya',show_pred=TRUE)
+eiu_plot('Colombia',show_pred=TRUE) 
 
 ### GSMA Mobile Money Regulation Index
-
-# TODO: double-check names of these variables, write a text description of each
 
 rename_mmri <- tibble(
   variable=c("mmri","mmri_auth","mmri_consumer","mmri_transact","mmri_kyc",
@@ -183,6 +181,14 @@ rename_mmri <- tibble(
           'KYC','Agent network','Infrastructure and investment environment'),
   flip=FALSE
 )
+
+# TODO: move these descriptions into a Google doc
+# Authorization -- measures the ability of non-banks to become authorized to offer MM services, incuding eligibility, initial capital requirements, and ability to offer international remittances
+# Consumer protection -- measures requirements on MM providers to safeguard funds, provide deposit insurance, and adhere to consumer protection rules
+# Transaction limits -- measures limits on single transactions, monthly transactions, and account balances that are prescribed by the country's Central Bank -- higher scores correspond to higher limits
+# KYC -- measures how much flexibility providers enjoy in establishing customer identity, whether MM providers are required to report on AFL/CFT, and whether regulations provide requirements on identification
+# Agent network -- measures how much flexibility operators have in registering agents, and what those agents are allowed to do
+# Infrastructure/investment -- measures infrastructure like automated KYC verification, payments/settlements. Also discriminatory taxation on mobile money services, interest payments on MM accounts, financial inclusion policies
 
 mmri_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                       sort_order='cor',num_pcs=5) {
