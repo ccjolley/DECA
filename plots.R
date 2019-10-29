@@ -256,6 +256,46 @@ econ_gaps_plot('Kenya')
 econ_gaps_plot('Colombia')
 
 ### TODO: I don't yet have anything that visualizes the IMF data.
+source('imf.R')
+imf_all <- read_dta('data/IMF_financial_access_survey.dta')
+
+get_imf_label <- function(x) {
+  attr(getElement(imf_all,x),'label')
+}
+
+rename_imf <- tibble(
+  variable=c("i_branches_A1_pop","i_branches_A2_pop","i_branches_A3B1a_pop",
+             "i_ATMs_pop","i_mob_agent_active_pop","i_mob_agent_registered_pop",
+             "i_nonbranch_A1_pop","i_depositors_A1_pop","i_depositors_A1_hhs_pop",
+             "i_depositors_A2_pop","i_deposit_acc_A1_pop","i_deposit_acc_A1_hhs_pop",
+             "i_deposit_acc_A2_pop","i_borrowers_A1_pop","i_borrowers_A1_hhs_pop",
+             "i_borrowers_A2_pop","i_borrowers_A3B1a_pop","i_loan_acc_A1_pop",
+             "i_loan_acc_A1_hhs_pop","i_loan_acc_A2_pop","i_acc_loan_A3B1a_pop",
+             "i_mob_acc_registered_pop","i_mob_acc_active_pop","i_mob_transactions_number_pop",
+             "i_cards_credit_pop","i_cards_debit_pop","i_mob_internet_number_A1_pop",
+             "i_policies_B2_life_pop","i_depositors_A1_hhs_gendergap","i_deposit_acc_A1_hhs_gendergap",
+             "i_borrowers_A1_hhs_gendergap","i_borrowers_A3B1a_gendergap","i_loan_acc_A1_hhs_gendergap",
+             "i_acc_loan_A3B1a_gendergap"),
+  flip=FALSE
+)
+rename_imf$part_label <- sapply(rename_imf$variable,get_imf_label)  
+rename_imf$label <- c(rename_imf$part_label[1:28],'Gender gap in depositors of hh sector with commercial banks',
+                      'Gender gap in deposit accounts of hh sector with commercial banks',
+                      'Gender gap in borrowers of hh sector with commercial banks',
+                      'Gender gap in microfinance borrowers','Gender gap in commercial loan account ownership',
+                      'Gender gap in microfinance loan account ownership')
+
+imf_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                           sort_order='none',num_pcs=5) {
+  imf %>%
+    j2sr_style_plot(rename_imf,country_name,show_pred,
+                    shade_fraction,sort_order,num_pcs) +
+    ggtitle(paste0('IMF Financial Access Survey: ',country_name))
+}
+
+imf_plot('Kenya')
+imf_plot('Colombia')
+# TODO: use some regex to shorten titles a little
 
 ###############################################################################
 # Infrastructure

@@ -296,5 +296,57 @@ theme_USAID <- theme(
   legend.key = element_blank(),
   text=element_text(family="Liberation Sans")) 
 
+###############################################################################
+# Utilities for PCA calculations
+###############################################################################
 
+### Function that removes columns that are NA for more than a given fraction of 
+### USAID countries
+trim_columns <- function(df,frac,keep_list=NULL) {
+  # if no keep_list provided, include all countries
+  if (is.null(keep_list)) {
+    keep_list <- df$country
+  }
+  na_frac <- df %>% 
+    filter(country %in% keep_list) %>%
+    is.na %>%
+    colMeans
+  keep_names <- na_frac[na_frac <= (1-frac)] %>% names
+  df %>% select(keep_names)
+}
+
+### Function that removes non-USAID countries for which more than a given 
+### fraction of rows are missing. I'm willing to work a little harder to impute
+### missing values for USAID countries, but I'm not going to spend that effort
+### on Montserrat, for example.
+
+trim_rows <- function(df,frac,keep_list=c()) {
+  tmp <- df %>% filter(!country %in% keep_list)
+  missing <- tmp %>% 
+    select(-country) %>%
+    is.na %>%
+    rowMeans
+  also_keep <- tmp$country[missing <= (1-frac)]
+  df %>% filter(country %in% c(keep_list,also_keep))
+}
+
+### Scatterplot of PCA results
+pc_scatter <- function(df,highlight_countries,f=0.03) {
+  plotme <- tibble(country=df$country,
+                   pc1=df$PC1,
+                   pc2=df$PC2) %>%
+    mutate(color=ifelse(country %in% highlight_countries,'b','c'),
+           color=ifelse(pc1 < quantile(pc1,probs=f) | pc1 > quantile(pc1,probs=1-f) |
+                          pc2 < quantile(pc2,probs=f) | pc2 > quantile(pc2,probs=1-f),'a',color),
+           highlight= (color != 'c'),
+           label=ifelse(highlight,country,NA)
+    )
+  
+  ggplot(plotme,aes(x=pc1,y=pc2,color=color,label=label)) +
+    geom_point(size=1) +
+    geom_point(data=filter(plotme,highlight),size=3,shape=1) +
+    theme_USAID + colors_USAID +
+    theme(legend.position = 'none') +
+    geom_text_repel()
+}  
 

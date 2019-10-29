@@ -18,22 +18,7 @@ all <- full_join(a4ai,eiu,by='country') %>% # most country duplicates present af
   full_join(wb,by='country') %>%
   full_join(wef,by='country') 
 
-################################################################################
-# Function that removes columns that are NA for more than a given fraction of 
-# USAID countries
-################################################################################
-trim_columns <- function(df,frac,keep_list=NULL) {
-  # if no keep_list provided, include all countries
-  if (is.null(keep_list)) {
-    keep_list <- df$country
-  }
-  na_frac <- df %>% 
-    filter(country %in% keep_list) %>%
-    is.na %>%
-    colMeans
-  keep_names <- na_frac[na_frac <= (1-frac)] %>% names
-  df %>% select(keep_names)
-}
+
 
 # How many columns to keep?
 x <- 0.05*(1:20)
@@ -46,21 +31,7 @@ all_trim1 <- trim_columns(all,0.75,usaid_countries)
 c(ncol(all),ncol(all_trim1))
 # takes us from 250 columns to 92
 
-###############################################################################
-# Function that removes non-USAID countries for which more than a given 
-# fraction of rows are missing. I'm willing to work a little harder to impute
-# missing values for USAID countries, but I'm not going to spend that effort
-# on Montserrat, for example.
-###############################################################################
-trim_rows <- function(df,frac,keep_list=c()) {
-  tmp <- df %>% filter(!country %in% keep_list)
-  missing <- tmp %>% 
-    select(-country) %>%
-    is.na %>%
-    rowMeans
-  also_keep <- tmp$country[missing <= (1-frac)]
-  df %>% filter(country %in% c(keep_list,also_keep))
-}
+
 
 all_trim2 <- trim_rows(all_trim1,0.75,usaid_countries)
 c(nrow(all_trim1),nrow(all_trim2),length(usaid_countries))
@@ -83,6 +54,8 @@ plot(pr)
 summary(pr)
 # As we'd hope, lots of variation in the first PC; about 46% in the first two
 # need 30 PCs to cover 90% of variance
+
+# TODO: revise this to use pc_scatter instead
 
 f <- 0.03
 plotme <- tibble(country=all_trim2$country,
