@@ -65,7 +65,7 @@ tail(pc2_cor)
 
 ### Plot closest correlates
 
-# TODO: factor this out into a function
+# TODO: use factored-out functions in utils.R instead
 highlight_countries <- c('Kenya','Colombia','Nepal')
 f <- 0.03
 plotme <- access_imputed %>%
