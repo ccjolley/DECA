@@ -120,6 +120,7 @@ censorship_plot('China',shade_fraction=0.5,show_pred=FALSE,sort_order='cor')
 ###############################################################################
 # Digital society and governance
 ###############################################################################
+# TODO: there are actually a lot more V-Dem indices that could be important here, related to the online media environment.
 rename_society <- tibble(
   variable=c('v2x_civlib','v2x_clpol','v2x_clpriv','mci_content','ict_laws','nri_enviro'),
   label=c('Civil liberties (VDem)','Political civil liberties (VDem)',

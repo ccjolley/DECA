@@ -331,22 +331,29 @@ trim_rows <- function(df,frac,keep_list=c()) {
 }
 
 ### Scatterplot of PCA results
-pc_scatter <- function(df,highlight_countries,f=0.03) {
-  plotme <- tibble(country=df$country,
-                   pc1=df$PC1,
-                   pc2=df$PC2) %>%
-    mutate(color=ifelse(country %in% highlight_countries,'b','c'),
-           color=ifelse(pc1 < quantile(pc1,probs=f) | pc1 > quantile(pc1,probs=1-f) |
-                          pc2 < quantile(pc2,probs=f) | pc2 > quantile(pc2,probs=1-f),'a',color),
+highlight_scatter <- function(df,highlight_countries,f=0.03) {
+  plotme <- df %>%
+    rename(pc1=2,pc2=3) %>%
+    filter(!is.na(pc1) & !is.na(pc2)) %>%
+    mutate(color=ifelse(pc1 < quantile(pc1,probs=f,na.rm=TRUE) | pc1 > quantile(pc1,probs=1-f,na.rm=TRUE) |
+                          pc2 < quantile(pc2,probs=f,na.rm=TRUE) | pc2 > quantile(pc2,probs=1-f,na.rm=TRUE),'a','c'),
+           color=ifelse(country %in% highlight_countries,'b',color),
            highlight= (color != 'c'),
-           label=ifelse(highlight,country,NA)
-    )
+           label=ifelse(highlight,country,NA))
   
   ggplot(plotme,aes(x=pc1,y=pc2,color=color,label=label)) +
     geom_point(size=1) +
     geom_point(data=filter(plotme,highlight),size=3,shape=1) +
     theme_USAID + colors_USAID +
     theme(legend.position = 'none') +
-    geom_text_repel()
+    geom_text_repel() 
+}
+
+
+pc_scatter <- function(df,highlight_countries,f=0.03) {
+  df %>%
+    select(country,PC1,PC2) %>%
+    highlight_scatter(highlight_countries,f) +
+    xlab('PC1') + ylab('PC2')
 }  
 

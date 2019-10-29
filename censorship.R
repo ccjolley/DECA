@@ -3,6 +3,7 @@ source('vdem.R')
 source('fotn.R')
 source('rsf.R')
 library(mice)
+library(ggrepel)
 
 censor <- left_join(vdem,fotn,by='country') %>%
   left_join(rsf,by='country')
@@ -57,35 +58,13 @@ tail(pc2_cor)
 ### Plot closest correlates
 
 # TODO: factor this out into a function
-highlight_countries <- c('Kenya','Colombia','Nepal')
-f <- 0.03
-plotme <- censor_imputed %>%
+highlight_1 <- c('Kenya','Colombia','Nepal')
+highlight_2 <- c('Kenya','Uganda','United Republic of Tanzania','Ethiopia','Somalia','Rwanda','Burundi')
+highlight_3 <- c('Colombia','Brazil','Venezuela','Ecuador','Peru','Panama')
+
+censor_imputed %>%
   cbind(select(censor_trim2,country)) %>%
   select(country,v2smgovfilprc,v2smgovcapsec) %>%
-  rename(pc1=2,pc2=3) %>%
-  filter(!is.na(pc1) & !is.na(pc2)) %>%
-  mutate(color=ifelse(country %in% highlight_countries,'b','c'),
-         color=ifelse(pc1 < quantile(pc1,probs=f,na.rm=TRUE) | pc1 > quantile(pc1,probs=1-f,na.rm=TRUE) |
-                        pc2 < quantile(pc2,probs=f,na.rm=TRUE) | pc2 > quantile(pc2,probs=1-f,na.rm=TRUE),'a',color),
-         highlight= (color != 'c'),
-         label=ifelse(highlight,country,NA)
-  )
-
-ggplot(plotme,aes(x=pc1,y=pc2,color=color,label=label)) +
-  geom_point(size=1) +
-  geom_point(data=filter(plotme,highlight),size=3,shape=1) +
-  theme_USAID + colors_USAID +
-  theme(legend.position = 'none') +
-  geom_text_repel() +
+  highlight_scatter(highlight_1) +
   xlab('Government filtering in practice') +
   ylab('Government cyber capacity')
-
-###############################################################################
-# Time-series plots
-###############################################################################
-source('../Futures-tools/IFs_plots.R')
-country_compare('IFs_exports/mob_broadband_colombia.txt',
-                ytitle='Subscriptions per 100 people',dots=TRUE) +
-   ggtitle('Mobile broadband adoption')
-
-# TODO: update numbers based on GSMA intelligence, see how close IFs tracks and update as needed
