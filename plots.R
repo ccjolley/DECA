@@ -323,7 +323,7 @@ rename_infra <- tibble(
           'Nework performance (MCI dimension)','Mobile download speed','Mobile upload speed','Mobile latency',
           'Enabling infrastructure (MCI dimension)','Electricy access','Interational internet bandwidth',
           'Secure internet servers','Top-level domains per capita','IXPs per capita','Spectrum (MCI dimension)',
-          'Digital dividend spectrum','Spectrum below 1 GHz','Spuctrum 1-3 GHz'),
+          'Digital dividend spectrum','Spectrum below 1 GHz','Spectrum 1-3 GHz'),
   flip=FALSE
 )
 
