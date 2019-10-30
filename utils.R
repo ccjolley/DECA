@@ -3,6 +3,7 @@ library(dplyr)
 library(reshape2)
 library(readr)
 library(ggplot2)
+library(ggrepel)
 
 ###############################################################################
 # Standardize country names. When possible, names should match the Natural
@@ -61,7 +62,8 @@ fix_adm0 <- function(df) {
                                     "Eswatini, Kingdom of","Iran, Islamic Republic of","Kosovo, Republic of",
                                     "Marshall Islands, Republic of","Micronesia, Federated States of",
                                     "North Macedonia, Republic of","Serbia, Republic of","Timor-Leste, Dem. Rep. of",
-                                    "Venezuela, Republica Bolivariana de","United Republic Of Tanzania"),
+                                    "Venezuela, Republica Bolivariana de","United Republic Of Tanzania",'Bosnia-Herzegovina',
+                                    'Central African Rep','D R Congo','Trinidad/Tobago'),
                           country_new=c('The Bahamas','The Bahamas','Myanmar','Myanmar','Cabo Verde',
                                         'Democratic Republic of the Congo',
                                         'Democratic Republic of the Congo',
@@ -108,7 +110,8 @@ fix_adm0 <- function(df) {
                                         "Hong Kong","Macao","China","eSwatini","Iran","Kosovo",
                                         "Marshall Islands","Federated States of Micronesia",
                                         "Macedonia","Republic of Serbia","East Timor","Venezuela",
-                                        "United Republic of Tanzania"))
+                                        "United Republic of Tanzania",'Bosnia and Herzegovina','Central African Republic',
+                                        'Democratic Republic of the Congo','Trinidad and Tobago'))
                                        
   tmp <- df %>%
     mutate(country=sub('Saint\\.','Saint',country),
