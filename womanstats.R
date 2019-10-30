@@ -36,10 +36,17 @@ ws5 <- read_xls('data/MULTIVAR-SCALE-5.xls',sheet=1) %>%
   mutate(Data=as.numeric(Data)) %>%
   rename(country=1,gov_framework=2)
 
+ws6 <- read_xls('data/MULTIVAR-SCALE-6.xls',sheet=1) %>% 
+  filter(`Bibliography Year` == 2017) %>%
+  select(Country,Data) %>%
+  mutate(Data=as.numeric(Data)) %>%
+  rename(country=1,patrilin_frat=2)
+
 ws <- full_join(ws1,ws2,by='country') %>%
   full_join(ws3,by='country') %>%
   full_join(ws4,by='country') %>%
-  full_join(ws5,by='country')
+  full_join(ws5,by='country') %>%
+  full_join(ws6,by='country')
 
 ws %>% filter(is.na(law_practice_discrepancy) | is.na(inequity_family))
 
@@ -54,7 +61,7 @@ ws_imputed <- ws %>%
 
 pc <- ws_imputed %>%
   prcomp(center=TRUE,scale=TRUE)
-summary(pc) # 71% in first variable
+summary(pc) # 74% in first variable
 
 pc$x %>%
   as_tibble() %>%
@@ -88,7 +95,7 @@ ws_pcs %>% filter(is.na(PC1))
 ws_pcs %>% filter(is.na(ws_PC1))  
 
 cor(ws_pcs$ws_PC1,ws_pcs$PC1,use='complete.obs')
-# -0.843 -- pretty strong with digital sophistication
+# -0.849 -- pretty strong with digital sophistication
 
 cor(ws_pcs$ws_PC1,ws_pcs$PC2,use='complete.obs')
 # -0.18 -- less so with digital openness
