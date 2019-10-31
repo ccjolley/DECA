@@ -14,7 +14,7 @@ rename_wef_private <- tibble(
   flip=FALSE
 )
 
-wef_private <- wef_nri <- read_excel('data/WEF_NRI_2012-2016_Historical_Dataset.xlsx',sheet=2,skip=3) %>%
+wef_private <- read_excel('data/WEF_NRI_2012-2016_Historical_Dataset.xlsx',sheet=2,skip=3) %>%
   rename(code=`Code NRI 2016`, series=`Series unindented`) %>%
   filter(series %in% rename_wef_private$series, 
          Attribute=='Value', 
@@ -36,3 +36,39 @@ wef_private_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 }
 
 wef_private_plot('Colombia')
+
+###############################################################################
+# Tech adoption in public sector
+###############################################################################
+rename_wef_public <- tibble(
+  series = c("Importance of ICTs to gov’t vision, 1-7 (best)", "Government Online Service Index, 0–1 (best)",
+             "Gov’t success in ICT promotion, 1-7 (best)","ICT use & gov’t efficiency, 1-7 (best)",
+             "E-Participation Index, 0–1 (best)","Gov’t procurement of advanced tech, 1-7 (best)"),
+  variable = c('ict_vision','online_services','ict_promotion','ict_gov_efficiency','e_participaton','gov_procure'),
+  label = c("Importance of ICTs to gov’t vision", "Government Online Service Index",
+               "Gov’t success in ICT promotion","ICT improves gov't services",
+               "Value of gov't websites","Gov’t procurement of advanced tech"),
+  flip=FALSE
+)
+
+wef_public <- read_excel('data/WEF_NRI_2012-2016_Historical_Dataset.xlsx',sheet=2,skip=3) %>%
+  rename(code=`Code NRI 2016`, series=`Series unindented`) %>%
+  filter(series %in% rename_wef_public$series, 
+         Attribute=='Value', 
+         Edition==2016) %>%
+  left_join(rename_wef_public,by='series') %>%
+  select(variable,Albania:Zimbabwe) %>%
+  melt(id.var='variable',variable.name='country') %>%
+  dcast(country ~ variable) %>%
+  mutate_at(2:7,as.numeric) 
+
+wef_public_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                            sort_order='cor',num_pcs=5) {
+  wef_public %>%
+    j2sr_style_plot(rename_wef_public,
+                    country_name,show_pred,
+                    shade_fraction,sort_order,num_pcs) +
+    ggtitle(paste0('WEF public sector: ',country_name))
+}
+
+wef_public_plot('Colombia')
