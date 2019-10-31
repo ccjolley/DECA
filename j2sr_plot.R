@@ -73,6 +73,7 @@ j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
     mutate(highlight_val=first(value)) %>%
     ungroup %>%
     filter(!is.na(highlight_val)) 
+
   if (show_pred) {
     tmp <- tmp %>% 
       left_join(read_csv('pc.csv'),by='country')
@@ -102,13 +103,13 @@ j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
   if (sort_order=='value') {
     plotme <- mutate(plotme,label=fct_reorder(label,highlight_val))
   } else if (sort_order=='cor') {
-    cs <- corr_sort(select(tmp,-country,-starts_with('pc')))
+    cs <- corr_sort(select(tmp,-country,-starts_with('PC',ignore.case=FALSE)))
     sorted_levels <- rename_tbl$label[match(cs,rename_tbl$variable)] %>% rev
     plotme <- mutate(plotme,label=factor(label,levels=sorted_levels))
   } else if (sort_order=='none') {
     plotme <- mutate(plotme,label=factor(label,levels=rev(rename_tbl$label)))
   }
-  
+
   ## Set up plot canvas
   p <- ggplot(plotme,aes(x=value,y=label,color=highlight)) 
   ## Put gray box in the back if desired

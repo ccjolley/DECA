@@ -171,7 +171,7 @@ eiu_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 }
 
 eiu_plot('Kenya',show_pred=TRUE)
-eiu_plot('Colombia',show_pred=TRUE) 
+eiu_plot('Colombia') 
 
 ### GSMA Mobile Money Regulation Index
 
