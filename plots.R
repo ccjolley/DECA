@@ -27,7 +27,7 @@ rename_access <- tibble(
   mutate(flip=(variable %in% c('Cost_1_GB_Share_GNICM','internet_gender_gap')))
 
 access_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                            sort_order='cor',num_pcs=5) {
+                            sort_order='cor',num_pcs=5,overall_score=NULL) {
   wef %>%
     select(country,mobile_subs,internet_users,fixed_internet,mobile_broadband,
            nri_usage) %>%
@@ -39,12 +39,12 @@ access_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
     left_join(select(a4ai,country,Cost_1_GB_Share_GNICM,access_a4ai,overall_a4ai),
               by='country') %>%
     j2sr_style_plot(rename_access,country_name,show_pred,
-                    shade_fraction,sort_order,num_pcs) +
+                    shade_fraction,sort_order,num_pcs,overall_score) +
       ggtitle(paste0('Access and use: ',country_name))
 }
 
-access_plot('Kenya')
-access_plot('Colombia')
+access_plot('Kenya',overall_score='mean')
+access_plot('Colombia',overall_score='PC1')
 
 ###############################################################################
 # Under Access & Use -- specific plot for digital literacy

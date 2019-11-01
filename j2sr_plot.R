@@ -2,6 +2,7 @@ library(ggplot2)
 library(tidyverse)
 library(ggrepel)
 library(reshape2)
+library(mice)
 source('utils.R')
 
 ###############################################################################
@@ -40,6 +41,36 @@ corr_sort <- function(d) {
   result
 }
 
+# rescale variable so that average value of lowest quintile is 1 and 
+# highest quintile is 5
+make_norm <- function(x) { 
+  #(x - mean(x, na.rm=TRUE)) / sd(x, na.rm=TRUE)
+  q1 <- mean(x[x <= quantile(x,probs=0.2,na.rm=TRUE)],na.rm=TRUE)
+  q5 <- mean(x[x >= quantile(x,probs=0.8,na.rm=TRUE)],na.rm=TRUE)
+  xnew <- 4*(x - q1)/(q5-q1) + 1
+}
+
+###############################################################################
+# Calculate an "overall" value (based on PC1 of included variables),
+###############################################################################
+pc1_summary <- function(d,country_name,verbose=TRUE) {
+  missing <- is.na(d) %>% rowSums
+  d <- d[missing < (ncol(d)-1),]
+  pr <- mice(d,m=1,seed=1234) %>%
+    mice::complete(1) %>%
+    select(-country) %>%
+    prcomp(center=TRUE,scale=TRUE)
+  if (verbose) {
+    message('PCA weights')
+    print(pr)
+  }
+  d2 <- pr$x %>%
+    as_tibble %>%
+    cbind(select(d,country)) %>%
+    mutate(PC1=make_norm(PC1))
+  d2[d2$country==country_name,'PC1']
+}
+
 ###############################################################################
 # Create a "J2SR-style" plot that highlights the position of one country across
 # a set of indicators, relative to all others in the dataset.
@@ -53,16 +84,15 @@ corr_sort <- function(d) {
 #                FALSE if it can be left as-is).
 ###############################################################################
 j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
-                            shade_fraction=NA,sort_order='value',num_pcs=2) {
+                            shade_fraction=NA,sort_order='value',num_pcs=2,
+                            overall_score='PC1') {
   flip_vars <- filter(rename_tbl,flip)$variable
-  # Need to use this instead of scale(), because scale returns a matrix and screws up dplyr
-  make_norm <- function(x) { 
-    (x - mean(x, na.rm=TRUE)) / sd(x, na.rm=TRUE)
+  flip <- function(x,flip_at=3) {
+    (flip_at - x) + flip_at
   }
-  
   tmp <- data  %>%
     mutate_at(rename_tbl$variable,make_norm) %>%
-    mutate_at(flip_vars, function(x) -x) 
+    mutate_at(flip_vars, flip) 
   
   plotme <- tmp %>%
     melt %>%
@@ -137,14 +167,17 @@ j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
       geom_tile(data=add_boxes,aes(x=center,y=label,width=width,height=0.9),fill='#CFCDC9',color=NA)
   }  
   ## Add dots for countries
+  x_min <- min(c(0,plotme$value[plotme$highlight],na.rm=TRUE))
+  x_max <- max(c(6,plotme$value[plotme$highlight],na.rm=TRUE))
   p <- p +
     #geom_jitter(data=filter(plotme,!highlight),size=2,alpha=1,width=0,height=0.1,shape=1) +
     geom_jitter(data=filter(plotme,!highlight),size=2,alpha=0.1,width=0,height=0.1) +
     geom_point(data=filter(plotme,highlight),size=5) +
+    scale_x_continuous(limits=c(x_min,x_max),breaks=1:5) +
     theme_USAID + colors_USAID +
     theme(legend.position = 'none',
-          axis.title=element_blank(),
-          axis.text.x=element_blank())
+          #axis.text.x=element_blank(),
+          axis.title=element_blank())
   ## Add prediction lines if desired
   if (show_pred) {
     p <- p + 
@@ -152,5 +185,18 @@ j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
       geom_segment(aes(xend=pred,yend=label),size=1) +
       geom_point(data=filter(plotme,highlight,!sig),size=3,color='#CFCDC9') 
   }
+  ### Add overall score if desired
+  if (!is.null(overall_score)) {
+    if (overall_score == 'mean') {
+      overall <- filter(plotme,highlight)$value %>% mean
+    } else if (overall_score == 'PC1') {
+      overall <- pc1_summary(tmp,country_name)
+    }
+    p <- p +
+      geom_vline(xintercept=overall,color='#BA0C2F') +
+      labs(caption=paste0('Overall score: ',round(overall,1))) +
+      theme(plot.caption = element_text(color = '#BA0C2F'))
+  }
   p
 }
+
