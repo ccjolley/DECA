@@ -83,6 +83,7 @@ pc1_summary <- function(d,country_name,verbose=TRUE) {
 #                variable should be inverted so that low=bad and high=good, 
 #                FALSE if it can be left as-is).
 ###############################################################################
+# TODO: un-select variables not included in rename_tbl so that I don't get an "NA" row
 j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
                             shade_fraction=NA,sort_order='value',num_pcs=2,
                             overall_score='PC1') {

@@ -13,21 +13,19 @@ rename_access <- tibble(
   variable=c("mobile_subs","internet_users","fixed_internet","mobile_broadband",
              "nri_usage","mci_afford","mci_consumer",
              "fixed_bb","hh_mobile","hh_computer","hh_internet","ind_computer",
-             "ind_mobile","internet_gender_gap","ind_internet","mobile_cell","fixed_tel",
-             "Cost_1_GB_Share_GNICM","access_a4ai","overall_a4ai"),
+             "ind_mobile","internet_gender_gap","ind_internet","mobile_cell","fixed_tel"),
     label=c('Mobile subscriptions (WEF)','Internet users (WEF)','Fixed internet subscriptions (WEF)',
             'Mobile broadband subscriptions (WEF)','ICT Use (J2SR/WEF)','Affordability (GSMA)',
             'Consumer readiness (GSMA)','Fixed broadband subscriptions (ITU)',
             'HH mobile ownership (ITU)','HH computer ownership (ITU)','HH internet use (ITU)',
             'Individual computer use (ITU)','Individual mobile use (ITU)',
             'Gender gap in internet use (ITU)','Individual internet use (ITU)',
-            'Mobile subscriptions (ITU)','Fixed telephone subscriptions (ITU)',
-            'Cost of 1GB data (A4AI)','Access index (A4AI)','Overall index (A4AI)')
+            'Mobile subscriptions (ITU)','Fixed telephone subscriptions (ITU)')
 ) %>%
   mutate(flip=(variable %in% c('Cost_1_GB_Share_GNICM','internet_gender_gap')))
 
 access_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                            sort_order='cor',num_pcs=5,overall_score=NULL) {
+                            sort_order='cor',num_pcs=5,overall_score='PC1') {
   wef %>%
     select(country,mobile_subs,internet_users,fixed_internet,mobile_broadband,
            nri_usage) %>%
@@ -36,15 +34,15 @@ access_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
     left_join(select(itu,country,fixed_bb,hh_mobile,hh_computer,hh_internet,
                      ind_computer,ind_mobile,internet_gender_gap,ind_internet,
                      mobile_cell,fixed_tel),by='country') %>%
-    left_join(select(a4ai,country,Cost_1_GB_Share_GNICM,access_a4ai,overall_a4ai),
-              by='country') %>%
+    # left_join(select(a4ai,country,Cost_1_GB_Share_GNICM,access_a4ai,overall_a4ai),
+    #           by='country') %>%
     j2sr_style_plot(rename_access,country_name,show_pred,
                     shade_fraction,sort_order,num_pcs,overall_score) +
       ggtitle(paste0('Access and use: ',country_name))
 }
 
-access_plot('Kenya',overall_score='mean')
-access_plot('Colombia',overall_score='PC1')
+# access_plot('Kenya',overall_score='mean')
+# access_plot('Colombia',overall_score='PC1')
 
 ###############################################################################
 # Under Access & Use -- specific plot for digital literacy
@@ -55,26 +53,42 @@ rename_sdg4 <- tibble(
   variable=setdiff(names(sdg4),'country'),
   label=c('Copy/paste','Create presentation','Install software','Move files to a device',
           'Copy/move file or folder','Install a new device','Sent email with attachment',
-          'Use spreadsheet','Write program','GG: Copy/paste','GG: Create presentation',
-          'GG: Install software','GG: Move files to device','GG: Copy/move file or folder',
-          'GG: Install new device','GG: Sent email with attachment','GG: Use spreadsheet',
-          'GG: Write program'),
+          'Use spreadsheet','Write program','Gender gap: Copy/paste','Gender gap: Create presentation',
+          'Gender gap: Install software','Gender gap: Move files to device','Gender gap: Copy/move file or folder',
+          'Gender gap: Install new device','Gender gap: Sent email with attachment','Gender gap: Use spreadsheet',
+          'Gender gap: Write program'),
   flip=FALSE
-)
+) 
 
 # TODO: other digital literacy variables to include?
 dig_lit_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                         sort_order='none',num_pcs=5) {
+                         sort_order='none',num_pcs=5,overall_score='PC1') {
   j2sr_style_plot(sdg4,rename_sdg4,country_name,show_pred,
-                  shade_fraction,sort_order,num_pcs) +
-    ggtitle(paste0('Digital literacy: ',country_name)) +
-    labs(caption='GG = Gender Gap')
+                  shade_fraction,sort_order,num_pcs,overall_score) +
+    ggtitle(paste0('Digital literacy: ',country_name)) 
 }
   
-dig_lit_plot('Colombia')
+# dig_lit_plot('Colombia')
 
 # TODO: in this case, since many are in comparable units, it might make sense 
 # to skip normalization
+
+###############################################################################
+# Affordability
+###############################################################################
+rename_afford <- tibble(
+  variable=c("Cost_1_GB_Share_GNICM","access_a4ai","overall_a4ai"),
+  label=c('Cost of 1GB data (A4AI)','Access index (A4AI)','Overall index (A4AI)')
+) %>%
+  mutate(flip=(variable %in% c('Cost_1_GB_Share_GNICM')))
+
+afford_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                        sort_order='cor',num_pcs=5,overall_score='PC1') {
+  select(a4ai,country,Cost_1_GB_Share_GNICM,access_a4ai,overall_a4ai) %>%
+    j2sr_style_plot(rename_afford,country_name,show_pred,
+                    shade_fraction,sort_order,num_pcs,overall_score) +
+    ggtitle(paste0('Affordability: ',country_name))
+}
 
 ###############################################################################
 # Censorship, information integrity, and digital rights
@@ -86,14 +100,13 @@ source('rsf.R')
 rename_censor <- tibble(
   variable=c('v2smgovfilcap','v2smgovfilprc','v2smgovshutcap','v2smgovshut',
              'v2smgovsm','v2smgovsmalt','v2smgovsmmon','v2smgovsmcenprc',
-             'v2smgovcapsec','v2smpolcap','v2smregcon','v2smprivex','v2smprivcon',
+             'v2smregcon','v2smprivex','v2smprivcon',
              'v2smregcap','v2smregapp','v2smlawpr','v2smdefabu',
              "v2x_civlib","v2x_clpol","v2x_clpriv",'press_freedom','access_obstacles','content_limits',
              'user_violations','fotn_total'),
   label=c('Gov filtering capacity','Gov filtering in practice','Gov shutdown capacity',
           'Gov shutdown in practice','Social media shutdown in practice',
           'Social media alternatives','Social media monitoring','Social media censorship',
-          'Gov cyber capacity','Political parties cyber capacity',
           'Internet legal regulation content','Privacy protection by law exists',
           'Privacy protection by law content','Gov capacity to regulate online content',
           'Gov online content regulation approach','Defamation protection',
@@ -104,18 +117,36 @@ rename_censor <- tibble(
 ) %>%
   mutate(flip=grepl('\\(.*\\)',label))
 
-censorship_plot <- function(country_name,show_pred=TRUE,shade_fraction=NA,
-                            sort_order='value',num_pcs=5) {
-  left_join(vdem,fotn,by='country') %>%
+censorship_plot <- function(country_name,show_pred=FALSE,shade_fraction=NA,
+                            sort_order='cor',num_pcs=5,overall_score='PC1') {
+  select(vdem,-v2smgovcapsec,-v2smpolcap) %>%
+    left_join(fotn,by='country') %>%
     left_join(rsf,by='country') %>%
     j2sr_style_plot(rename_censor,country_name,show_pred,
-                    shade_fraction,sort_order,num_pcs) +
+                    shade_fraction,sort_order,num_pcs,overall_score) +
       ggtitle(paste0('Censorship, information integrity, and digital rights: ',country_name))
 }
 
-censorship_plot('Colombia',shade_fraction=0.5,show_pred=FALSE,sort_order='cor')
-censorship_plot('Kenya',shade_fraction=0.5,show_pred=FALSE,sort_order='cor') 
-censorship_plot('China',shade_fraction=0.5,show_pred=FALSE,sort_order='cor') 
+# censorship_plot('Colombia',shade_fraction=0.5,show_pred=FALSE,sort_order='cor')
+# censorship_plot('Kenya',shade_fraction=0.5,show_pred=FALSE,sort_order='cor') 
+# censorship_plot('China',shade_fraction=0.5,show_pred=FALSE,sort_order='cor') 
+
+###############################################################################
+# Cybersecurity
+###############################################################################
+rename_cyber <- tibble(
+  label=c('Gov cyber capacity','Political parties cyber capacity'),
+  variable=c('v2smgovcapsec','v2smpolcap'),
+  flip=FALSE
+)
+
+cyber_plot <- function(country_name,show_pred=FALSE,shade_fraction=NA,
+                            sort_order='none',num_pcs=5) {
+  select(vdem,country,v2smgovcapsec,v2smpolcap) %>%
+    j2sr_style_plot(rename_cyber,country_name,show_pred,
+                    shade_fraction,sort_order,num_pcs) +
+    ggtitle(paste0('Cybersecurity: ',country_name))
+}
 
 ###############################################################################
 # Digital society and governance
@@ -141,8 +172,8 @@ society_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
     ggtitle(paste0('Digital society and governance: ',country_name))
 }
 
-society_plot('Kenya')
-society_plot('Colombia')
+# society_plot('Kenya')
+# society_plot('Colombia')
 
 ###############################################################################
 # Digital economy -- there are a few of these
@@ -171,8 +202,8 @@ eiu_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
     ggtitle(paste0('EIU Global Microscope: ',country_name))
 }
 
-eiu_plot('Kenya',show_pred=TRUE)
-eiu_plot('Colombia') 
+# eiu_plot('Kenya',show_pred=TRUE)
+# eiu_plot('Colombia') 
 
 ### GSMA Mobile Money Regulation Index
 
@@ -193,15 +224,15 @@ rename_mmri <- tibble(
 # Infrastructure/investment -- measures infrastructure like automated KYC verification, payments/settlements. Also discriminatory taxation on mobile money services, interest payments on MM accounts, financial inclusion policies
 
 mmri_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                      sort_order='cor',num_pcs=5) {
+                      sort_order='cor',num_pcs=5,overall_score='PC1') {
   select(gsma,country,starts_with('mmri')) %>%
     j2sr_style_plot(rename_mmri,country_name,show_pred,
-                    shade_fraction,sort_order,num_pcs) +
+                    shade_fraction,sort_order,num_pcs,overall_score) +
     ggtitle(paste0('GSMA Mobile Money Regulatory Index: ',country_name))
 }
 
-mmri_plot('Kenya')
-mmri_plot('Colombia')
+# mmri_plot('Kenya')
+# mmri_plot('Colombia')
 
 ### World Bank Findex
 source('wb.R')
@@ -215,16 +246,16 @@ rename_barrier <- tibble(
 )
 
 barrier_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                         sort_order='cor',num_pcs=5) {
+                         sort_order='cor',num_pcs=5,overall_score='PC1') {
   wb %>%
     select(country,starts_with('barrier')) %>%
     j2sr_style_plot(rename_barrier,country_name,show_pred,
-                    shade_fraction,sort_order,num_pcs) +
+                    shade_fraction,sort_order,num_pcs,overall_score) +
     ggtitle(paste0('Findex barriers to access: ',country_name))
 }
 
-barrier_plot('Colombia')
-barrier_plot('Kenya')
+# barrier_plot('Colombia')
+# barrier_plot('Kenya')
 
 rename_econ_gaps <- tibble(
   variable=c("acct","borrow","dig_pay","mm","acct_gender_gap",
@@ -245,17 +276,18 @@ rename_econ_gaps <- tibble(
   flip=FALSE
 )
 
+# TODO: this needs a better name
 econ_gaps_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                           sort_order='none',num_pcs=5) {
+                           sort_order='none',num_pcs=5,overall_score='PC1') {
   wb %>%
     select(country,one_of(rename_econ_gaps$variable)) %>%
     j2sr_style_plot(rename_econ_gaps,country_name,show_pred,
-                    shade_fraction,sort_order,num_pcs) +
+                    shade_fraction,sort_order,num_pcs,overall_score) +
     ggtitle(paste0('Findex access gaps: ',country_name))
 }
-
-econ_gaps_plot('Kenya')
-econ_gaps_plot('Colombia')
+# 
+# econ_gaps_plot('Kenya')
+# econ_gaps_plot('Colombia')
 
 ### TODO: I don't yet have anything that visualizes the IMF data.
 source('imf.R')
@@ -295,8 +327,8 @@ imf_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
     ggtitle(paste0('IMF Financial Access Survey: ',country_name))
 }
 
-imf_plot('Kenya')
-imf_plot('Colombia')
+# imf_plot('Kenya')
+# imf_plot('Colombia')
 # TODO: use some regex to shorten titles a little
 
 ###############################################################################
@@ -337,8 +369,8 @@ infra_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
     ggtitle(paste0('Infrastructure: ',country_name))
 }
 
-infra_plot('Kenya')
-infra_plot('Colombia')
+# infra_plot('Kenya')
+# infra_plot('Colombia')
   
 ###############################################################################
 # What hasn't been used yet?

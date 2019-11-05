@@ -1,6 +1,6 @@
 library(pdftools)
 library(tidyverse)
-library(string)
+library(stringr)
 # source('utils.R')
 
 postal <- pdf_text('data/postalDevelopmentReport2019En.pdf')

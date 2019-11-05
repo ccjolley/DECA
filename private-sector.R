@@ -27,11 +27,11 @@ wef_private <- read_excel('data/WEF_NRI_2012-2016_Historical_Dataset.xlsx',sheet
 
 
 wef_private_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                        sort_order='cor',num_pcs=5) {
+                        sort_order='cor',num_pcs=5,overall_score='PC1') {
   wef_private %>%
     j2sr_style_plot(rename_wef_private,
                     country_name,show_pred,
-                    shade_fraction,sort_order,num_pcs) +
+                    shade_fraction,sort_order,num_pcs,overall_score) +
     ggtitle(paste0('WEF private sector: ',country_name))
 }
 
@@ -63,11 +63,11 @@ wef_public <- read_excel('data/WEF_NRI_2012-2016_Historical_Dataset.xlsx',sheet=
   mutate_at(2:7,as.numeric) 
 
 wef_public_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                            sort_order='cor',num_pcs=5) {
+                            sort_order='cor',num_pcs=5,overall_score='PC1') {
   wef_public %>%
     j2sr_style_plot(rename_wef_public,
                     country_name,show_pred,
-                    shade_fraction,sort_order,num_pcs) +
+                    shade_fraction,sort_order,num_pcs,overall_score) +
     ggtitle(paste0('WEF public sector: ',country_name))
 }
 
