@@ -50,22 +50,40 @@ access_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 source('sdg4.R')
 
 rename_sdg4 <- tibble(
-  variable=setdiff(names(sdg4),'country'),
+  variable=c("copy_paste","create_pres","install_soft","move_device","move_file",
+             "new_device","sent_email","use_spreadsheet","write_program"),
   label=c('Copy/paste','Create presentation','Install software','Move files to a device',
           'Copy/move file or folder','Install a new device','Sent email with attachment',
-          'Use spreadsheet','Write program','Gender gap: Copy/paste','Gender gap: Create presentation',
-          'Gender gap: Install software','Gender gap: Move files to device','Gender gap: Copy/move file or folder',
-          'Gender gap: Install new device','Gender gap: Sent email with attachment','Gender gap: Use spreadsheet',
-          'Gender gap: Write program'),
+          'Use spreadsheet','Write program'),
+  flip=FALSE
+) 
+
+rename_sdg4_gaps <- tibble(
+  variable=c("copy_paste_gender_gap","create_pres_gender_gap","install_soft_gender_gap","move_device_gender_gap",
+             "move_file_gender_gap","new_device_gender_gap","sent_email_gender_gap","use_spreadsheet_gender_gap",
+             "write_program_gender_gap"),
+  label=c('Copy/paste','Create presentation',
+          'Install software','Move files to device','Copy/move file or folder',
+          'Install new device','Sent email with attachment','Use spreadsheet',
+          'Write program'),
   flip=FALSE
 ) 
 
 # TODO: other digital literacy variables to include?
 dig_lit_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                          sort_order='none',num_pcs=5,overall_score='PC1') {
-  j2sr_style_plot(sdg4,rename_sdg4,country_name,show_pred,
+  sdg4 %>% select(country,one_of(rename_sdg4$variable)) %>%
+  j2sr_style_plot(rename_sdg4,country_name,show_pred,
                   shade_fraction,sort_order,num_pcs,overall_score) +
     ggtitle(paste0('Digital literacy: ',country_name)) 
+}
+
+dig_lit_gap_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                         sort_order='none',num_pcs=5,overall_score='PC1') {
+  sdg4 %>% select(country,one_of(rename_sdg4_gaps$variable)) %>%
+    j2sr_style_plot(rename_sdg4_gaps,country_name,show_pred,
+                    shade_fraction,sort_order,num_pcs,overall_score) +
+    ggtitle(paste0('Digital literacy gender gaps: ',country_name)) 
 }
   
 # dig_lit_plot('Colombia')
@@ -77,14 +95,30 @@ dig_lit_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 # Affordability
 ###############################################################################
 rename_afford <- tibble(
-  variable=c("Cost_1_GB_Share_GNICM","access_a4ai","overall_a4ai"),
-  label=c('Cost of 1GB data (A4AI)','Access index (A4AI)','Overall index (A4AI)')
+  variable=c("Cost_1_GB_Share_GNICM","access_a4ai","overall_a4ai",
+             'mobile_tariffs','handset_prices','taxation','inequality',
+             'smartphone_cost','prepaid_cost','postpaid_cost','fixed_bb_cost','arpu',
+             'wireless_market_share','bb_market_share'),
+  label=c('Cost of 1GB data (A4AI)','Access index (A4AI)','Overall index (A4AI)',
+          'Mobile tariffs (GSMA)','Handset prices (GSMA)','Taxation (GSMA)',
+          'Inequality (GSMA)',
+          'Smartphone cost (3i)','Prepaid mobile cost (3i)','Postpaid mobile cost (3i)',
+          'Fixed broadband cost (3i)','Avg. revenue per user (3i)','Wireless market share (3i)',
+          'Broadband market share (3i)')
 ) %>%
-  mutate(flip=(variable %in% c('Cost_1_GB_Share_GNICM')))
+  mutate(flip=(variable %in% c('Cost_1_GB_Share_GNICM','wireless_market_share','bb_market_share',
+                               'prepaid_cost','postpaid_cost','fixed_bb_cost')))
+# Smartphone cost is on a different scale and doesn't need to be flipped
 
 afford_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                         sort_order='cor',num_pcs=5,overall_score='PC1') {
-  select(a4ai,country,Cost_1_GB_Share_GNICM,access_a4ai,overall_a4ai) %>%
+  left_join(a4ai,gsma,by='country') %>%
+    left_join(eiu,by='country') %>%
+    select(country,
+         Cost_1_GB_Share_GNICM,access_a4ai,overall_a4ai,
+         mobile_tariffs,handset_prices,taxation,inequality,
+         smartphone_cost,prepaid_cost,postpaid_cost,fixed_bb_cost,arpu,
+         wireless_market_share,bb_market_share) %>%
     j2sr_style_plot(rename_afford,country_name,show_pred,
                     shade_fraction,sort_order,num_pcs,overall_score) +
     ggtitle(paste0('Affordability: ',country_name))
@@ -98,30 +132,38 @@ source('fotn.R')
 source('rsf.R')
 
 rename_censor <- tibble(
-  variable=c('v2smgovfilcap','v2smgovfilprc','v2smgovshutcap','v2smgovshut',
+  variable=c('v2smgovfilprc','v2smgovshut',
              'v2smgovsm','v2smgovsmalt','v2smgovsmmon','v2smgovsmcenprc',
              'v2smregcon','v2smprivex','v2smprivcon',
              'v2smregcap','v2smregapp','v2smlawpr','v2smdefabu',
+             'v2smgovdom','v2smgovab','v2smpardom','v2smparab','v2smfordom','v2smforads','v2smarrest',
              "v2x_civlib","v2x_clpol","v2x_clpriv",'press_freedom','access_obstacles','content_limits',
              'user_violations','fotn_total'),
-  label=c('Gov filtering capacity','Gov filtering in practice','Gov shutdown capacity',
+  label=c('Gov filtering in practice',
           'Gov shutdown in practice','Social media shutdown in practice',
           'Social media alternatives','Social media monitoring','Social media censorship',
           'Internet legal regulation content','Privacy protection by law exists',
           'Privacy protection by law content','Gov capacity to regulate online content',
-          'Gov online content regulation approach','Defamation protection',
+          'Content regulation done by state (not private)','Defamation protection',
           'Abuse of defamation/copyright law by elites',
+          "Government dissemination of false information domestic",
+          "Government dissemination of false information abroad",
+          "Party dissemination of false information domestic",
+          "Party dissemination of false information abroad",
+          "Foreign governments dissemination of false information",
+          "Foreign governments ads",
+          "Arrests for political content",
           'Civil liberties','Political civil liberties','Private civil liberties',
           'Press freedom (RSF)','Obstacles to access (FH)','Limits on content (FH)',
           'Violations of user rights (FH)','Freedom on the net (FH)')
 ) %>%
   mutate(flip=grepl('\\(.*\\)',label))
 
-censorship_plot <- function(country_name,show_pred=FALSE,shade_fraction=NA,
+censorship_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                             sort_order='cor',num_pcs=5,overall_score='PC1') {
-  select(vdem,-v2smgovcapsec,-v2smpolcap) %>%
-    left_join(fotn,by='country') %>%
+  left_join(vdem,fotn,by='country') %>%
     left_join(rsf,by='country') %>%
+    select(country,one_of(rename_censor$variable)) %>%
     j2sr_style_plot(rename_censor,country_name,show_pred,
                     shade_fraction,sort_order,num_pcs,overall_score) +
       ggtitle(paste0('Censorship, information integrity, and digital rights: ',country_name))
@@ -134,15 +176,21 @@ censorship_plot <- function(country_name,show_pred=FALSE,shade_fraction=NA,
 ###############################################################################
 # Cybersecurity
 ###############################################################################
+source('ncsi.R')
 rename_cyber <- tibble(
-  label=c('Gov cyber capacity','Political parties cyber capacity'),
-  variable=c('v2smgovcapsec','v2smpolcap'),
+  label=c('Gov cyber capacity (VDem)','Political parties cyber capacity (VDem)',
+          'Global Cybersecurity Index (ITU)','National Cyber Security Index (Estonia)',
+          'Gov filtering capacity (VDem)','Gov shutdown capacity (VDem)'),
+  variable=c('v2smgovcapsec','v2smpolcap','itu_gci','ncsi','v2smgovfilcap',
+             'v2smgovshutcap'),
   flip=FALSE
 )
 
-cyber_plot <- function(country_name,show_pred=FALSE,shade_fraction=NA,
-                            sort_order='none',num_pcs=5) {
-  select(vdem,country,v2smgovcapsec,v2smpolcap) %>%
+cyber_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                            sort_order='cor',num_pcs=5) {
+  left_join(vdem,itu,by='country') %>%
+    left_join(ncsi,by='country') %>%
+    select(country,one_of(rename_cyber$variable)) %>%
     j2sr_style_plot(rename_cyber,country_name,show_pred,
                     shade_fraction,sort_order,num_pcs) +
     ggtitle(paste0('Cybersecurity: ',country_name))
@@ -154,19 +202,29 @@ cyber_plot <- function(country_name,show_pred=FALSE,shade_fraction=NA,
 # TODO: there are actually a lot more V-Dem indices that could be important here, related to the online media environment.
 # TODO: WEF NRI series 1 also has some good content on the high-level policy enviornment around icts, besides tho few I've got here
 rename_society <- tibble(
-  variable=c('v2x_civlib','v2x_clpol','v2x_clpriv','mci_content','ict_laws','nri_enviro'),
+  variable=c('v2x_civlib','v2x_clpol','v2x_clpriv','mci_content','ict_laws','nri_enviro',
+             'v2smonex','v2smonper','v2smmefra','v2smorgviol','v2smorgavgact','v2smorgelitact',
+             'v2smcamp','v2smpolsoc','v2smpolhate'),
   label=c('Civil liberties (VDem)','Political civil liberties (VDem)',
           'Private civil liberties (VDem)','Content & Services (GSMA)',
-          'Laws relating to ICTs (WEF)','Environment subindex (WEF)'),
+          'Laws relating to ICTs (WEF)','Environment subindex (WEF)',
+          "Online media existence (VDem)",
+          "Online media perspectives (VDem)",
+          "Online media fractionalization (VDem)",
+          "Use of social media to organize offline violence (VDem)",
+          "Average people’s use of social media to organize offline action (VDem)",
+          "Elites’ use of social media to organize offline action (VDem)",
+          "Party/candidate use of social media in campaigns (VDem)",
+          "Polarization of society (VDem)",
+          "Political parties hate speech (VDem)"),
   flip=FALSE
 )
 
 society_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                         sort_order='cor',num_pcs=5) {
-  vdem %>%
-    select(country,starts_with('v2x_')) %>%
-    left_join(select(gsma,country,mci_content),by='country') %>%
-    left_join(select(wef,country,ict_laws,nri_enviro),by='country')  %>%
+  left_join(vdem,gsma,by='country') %>%
+    left_join(wef,by='country') %>%
+    select(country,one_of(rename_society$variable)) %>%
     j2sr_style_plot(rename_society,country_name,show_pred,
                     shade_fraction,sort_order,num_pcs) +
     ggtitle(paste0('Digital society and governance: ',country_name))
@@ -257,31 +315,43 @@ barrier_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 # barrier_plot('Colombia')
 # barrier_plot('Kenya')
 
-rename_econ_gaps <- tibble(
-  variable=c("acct","borrow","dig_pay","mm","acct_gender_gap",
-             "borrow_gender_gap","dig_pay_gender_gap",'mm_gender_gap',"acct_wealth_gap",
+rename_findex <- tibble(
+  variable=c("acct","borrow","dig_pay","mm"),
+  label=c('Account ownership','Borrowed','Used digital payments','Mobile money'),
+  flip=FALSE
+)
+
+rename_findex_gaps <- tibble(
+  variable=c('acct_gender_gap',"borrow_gender_gap","dig_pay_gender_gap",'mm_gender_gap',"acct_wealth_gap",
              "borrow_wealth_gap","dig_pay_wealth_gap",'mm_wealth_gap',"acct_age_gap",
              "borrow_age_gap","dig_pay_age_gap",'mm_age_gap',"acct_ed_gap","borrow_ed_gap",
              "dig_pay_ed_gap",'mm_ed_gap',"acct_rural_gap","borrow_rural_gap",
              "dig_pay_rural_gap",'mm_rural_gap'),
-  label=c('Account ownership','Borrowed','Used digital payments','Mobile money',
-          'Account gender gap',
-          'Borrowing gender gap','Digital payments gender gap','Mobile money gender gap',
-          'Account wealth gap',
-          'Borrowing wealth gap','Digital payments wealth gap','Mobile money wealth gap','Account age gap',
-          'Borrowing age gap','Digital payments age gap','Mobile money age gap','Account education gap',
-          'Borrowing education gap','Digital payments education gap','Mobile money education gap',
-          'Account rural/urban gap','Borrowing rural/urban gap',
-          'Digital payments urban/rural gap','Mobile money urban/rural gap'),
+  label=c('Account (GENDER)',
+          'Borrowing (GENDER)','Digital payments (GENDER)','Mobile money (GENDER)',
+          'Account (WEALTH)',
+          'Borrowing (WEALTH)','Digital payments (WEALTH)','Mobile money (WEALTH)','Account (AGE)',
+          'Borrowing (AGE)','Digital payments (AGE)','Mobile money (AGE)','Account (EDUCATION)',
+          'Borrowing (EDUCATION)','Digital payments (EDUCATION)','Mobile money (EDUCATION)',
+          'Account (URBAN/RURAL)','Borrowing (URBAN/RURAL)',
+          'Digital payments (URBAN/RURAL)','Mobile money (URBAN/RURAL)'),
   flip=FALSE
 )
 
-# TODO: this needs a better name
-econ_gaps_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+findex_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                        sort_order='none',num_pcs=5,overall_score='PC1') {
+  wb %>%
+    select(country,one_of(rename_findex$variable)) %>%
+    j2sr_style_plot(rename_findex,country_name,show_pred,
+                    shade_fraction,sort_order,num_pcs,overall_score) +
+    ggtitle(paste0('Findex: ',country_name))
+}
+
+findex_gaps_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                            sort_order='none',num_pcs=5,overall_score='PC1') {
   wb %>%
-    select(country,one_of(rename_econ_gaps$variable)) %>%
-    j2sr_style_plot(rename_econ_gaps,country_name,show_pred,
+    select(country,one_of(rename_findex_gaps$variable)) %>%
+    j2sr_style_plot(rename_findex_gaps,country_name,show_pred,
                     shade_fraction,sort_order,num_pcs,overall_score) +
     ggtitle(paste0('Findex access gaps: ',country_name))
 }

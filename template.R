@@ -8,7 +8,7 @@ source('../Futures-tools/IFs_plots.R')
 
 # cname <- 'Kenya'
 # highlight_list <- c('Kenya','Uganda','United Republic of Tanzania','Ethiopia',
-#                     'Somalia','Rwanda','Burundi')
+#                     'Somalia','Rwanda','Burundi','Tanzania')
 cname <- 'Colombia'
 highlight_list <- c('Colombia','Brazil','Venezuela','Ecuador','Peru','Panama')
 
@@ -19,6 +19,13 @@ full_join(wef,a4ai,by='country') %>%
   highlight_scatter(highlight_list) +
   xlab('Percent of internet users') +
   ylab('Relative cost of 1 GB data')
+
+full_join(wef,gsma,by='country') %>%
+  select(country,internet_users,mobile_tariffs) %>%
+  mutate(country=ifelse(country=='United Republic of Tanzania','Tanzania',country)) %>%
+  highlight_scatter(highlight_list) +
+  xlab('Percent of internet users (WEF)') +
+  ylab('Affordability of mobile tariffs (GSMA)')
 
 # access indicator plot
 
@@ -33,22 +40,23 @@ country_compare('IFs_exports/mob_broadband_colombia.txt',
 
 # affordability indicators
 
-afford_plot(cname,overall_score='mean')
+afford_plot(cname,overall_score='PC1')
 # TODO: PC1 summary really doesn't look right for Colombia
 
 # digital literacy indicators
 
-dig_lit_plot(cname,overall_score='mean')
+dig_lit_plot(cname,overall_score='PC1')
+dig_lit_gap_plot(cname,overall_score='PC1')
 
 # WEF private sector
 
 # TODO: not all of this needs to be source'd here
 source('private-sector.R')
-wef_private_plot(cname,overall_score='mean')
+wef_private_plot(cname,overall_score='PC1')
 
 # WEF public sector
 
-wef_public_plot(cname,overall_score='mean')
+wef_public_plot(cname,overall_score='PC1')
 # TODO: something weird about PC1 here
 
 # freedom scatterplot
@@ -60,7 +68,7 @@ vdem %>%
 
 # freedom indicators
 
-censorship_plot(cname,sort_order='cor',overall_score='mean')
+censorship_plot(cname,sort_order='cor',overall_score='PC1')
 
 # cybersecurity indicators
 
@@ -68,13 +76,14 @@ cyber_plot(cname)
 
 # findex indicators
 
-econ_gaps_plot(cname,overall_score='mean')
+findex_plot(cname)
+findex_gaps_plot(cname)
 # TODO: this plot could use some more visual cues to separate categories
 
 # findex barriers
 
 barrier_plot(cname,overall_score='mean')
-# TODO: somehow, for Kenya and Colombia, the PC1 overall score is much lower in value that all of the points -- doesn't look right
+# sticking with the mean here, because PC1 doesn't make a lot of sense in this context
 
 # EIU Global Microscope
 
@@ -82,7 +91,7 @@ eiu_plot(cname)
 
 # GSMA MMRI
 
-mmri_plot(cname,overall_score='mean')
+mmri_plot(cname,overall_score='PC1')
 # TODO: actually needs a new option for overall score when one of the components *is* the overall score
 
 # Postal scatterplot
