@@ -6,7 +6,9 @@ mci <- read_excel('data/MCI_Data_2019.xlsx',sheet=3,skip=2) %>%
          6:10, # Four high-level indices
          11:14, # "Dimension" indices related to infrastructure
          `2G Coverage`:`Spectrum in 1-3GHz bands (MHz per operator)`,
-         `TLDs per capita`) %>%
+         `TLDs per capita`,
+         `Mobile tariffs`:`Inequality...18`
+         ) %>%
   rename(country=1,year=2,mci=3,mci_infra=4,mci_afford=5,mci_consumer=6,mci_content=7,
          mci_infra_coverage=8,mci_infra_performance=9,mci_infra_enabling=10,mci_infra_spectrum=11,
          cov_2G=`2G Coverage`,cov_3G=`3G Coverage`,cov_4G=`4G Coverage`,
@@ -15,7 +17,9 @@ mci <- read_excel('data/MCI_Data_2019.xlsx',sheet=3,skip=2) %>%
          elect=`Access to electricity`,bandwidth=`International Internet bandwidth per user`,
          spectrum_dd=`Digital dividend spectrum (MHz per operator)`,
          spectrum_low=`Other spectrum below 1GHz (MHz per operator)`,
-         spectrum_high=`Spectrum in 1-3GHz bands (MHz per operator)`) %>%
+         spectrum_high=`Spectrum in 1-3GHz bands (MHz per operator)`,
+         mobile_tariffs=`Mobile tariffs`,handset_prices=`Handset prices`,
+         taxation=Taxation,inequality=`Inequality...18`) %>%
   filter(year==2018) %>%
   select(-year) %>%
   fix_adm0
