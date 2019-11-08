@@ -282,7 +282,9 @@ non_countries <- c("Arab world","Developing","East Asia & Pacific",
                    "All countries","Africa","Asia","Central Asia",
                    "East Asia","Europe","Europe (EU)","Gulf Cooperation Council",
                    "Latin America","Middle East and North Africa","North Africa",
-                   "Southeast Asia-Pacific")
+                   "Southeast Asia-Pacific","Eastern Europe & Central Asia",
+                   "EU + EFTA + North America","Low","Lower middle","Upper middle",
+                   "High")
 
 ###############################################################################
 # Plotting functions

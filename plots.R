@@ -202,10 +202,12 @@ cyber_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 # TODO: there are actually a lot more V-Dem indices that could be important here, related to the online media environment.
 # TODO: WEF NRI series 1 also has some good content on the high-level policy enviornment around icts, besides tho few I've got here
 source('open_data.R')
+source('wjp.R')
 rename_society <- tibble(
   variable=c('v2x_civlib','v2x_clpol','v2x_clpriv','mci_content','ict_laws','nri_enviro',
              'v2smonex','v2smonper','v2smmefra','v2smorgviol','v2smorgavgact','v2smorgelitact',
-             'v2smcamp','v2smpolsoc','v2smpolhate','open_data'),
+             'v2smcamp','v2smpolsoc','v2smpolhate','open_data',
+             'open_gov','public_laws','right_to_info','civic_part','complaint'),
   label=c('Civil liberties (VDem)','Political civil liberties (VDem)',
           'Private civil liberties (VDem)','Content & Services (GSMA)',
           'Laws relating to ICTs (WEF)','Environment subindex (WEF)',
@@ -217,7 +219,9 @@ rename_society <- tibble(
           "Elites’ use of social media to organize offline action (VDem)",
           "Party/candidate use of social media in campaigns (VDem)",
           "Polarization of society (VDem)",
-          "Political parties hate speech (VDem)",'Open Data Index (OKF)'),
+          "Political parties hate speech (VDem)",'Open Data Index (OKF)',
+          'Open government (WJP/J2SR)','Publicized laws and gov data (WJP)',
+          'Right to information (WJP)','Civic participation (WJP)','Complaint mechanisms (WJP)'),
   flip=FALSE
 )
 
@@ -226,6 +230,7 @@ society_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
   full_join(vdem,gsma,by='country') %>%
     full_join(wef,by='country') %>%
     full_join(open_data,by='country') %>%
+    full_join(wjp,by='country') %>%
     select(country,one_of(rename_society$variable)) %>%
     j2sr_style_plot(rename_society,country_name,show_pred,
                     shade_fraction,sort_order,num_pcs) +
