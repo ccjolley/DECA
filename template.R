@@ -48,10 +48,12 @@ afford_plot(cname,overall_score='PC1')
 dig_lit_plot(cname,overall_score='PC1')
 dig_lit_gap_plot(cname,overall_score='PC1')
 
+source('wef-plots.R')
+wef_literacy_plot(cname)
+
 # WEF private sector
 
 # TODO: not all of this needs to be source'd here
-source('private-sector.R')
 wef_private_plot(cname,overall_score='PC1')
 
 # WEF public sector
