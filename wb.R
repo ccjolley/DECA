@@ -185,9 +185,28 @@ wb_findex <- read_excel('data/Global Findex Database.xlsx',sheet=1) %>%
          -ends_with('_labor'),-ends_with('_nolabor'),-ends_with('_old'),-ends_with('_young'),
          -ends_with('_ed'),-ends_with('_uned'),-ends_with('_rural'))
 
+# Doing Business index
+db_codes <- c('IC.BUS.EASE.DFRN.XQ.DB1719','TRD.ACRS.BRDR.DB1619.DFRN')
+# DB contains some specific cities, in addition to country-level scores
+cities <- c("Beijing","Chittagong","Delhi","Dhaka","Jakarta","Kano",
+            "Karachi","Lagos","Lahore","Los Angeles","Mexico City","Monterrey",
+            "Moscow","Mumbai","New York","Osaka","Puerto Rico","Rio de Janeiro",
+            "Sao Paulo","Shanghai","Saint Petersburg","Surabaya","Tokyo")
+wb_biz <- read_csv('data/DBData.csv') %>%
+  rename(country=`Country Name`,indicator=`Indicator Name`,code=`Indicator Code`,value=`2020`) %>%
+  filter(code %in% db_codes) %>%
+  select(country,indicator,value) %>%
+  dcast(country ~ indicator) %>%
+  rename(db_score=2,db_trade=3) %>%
+  fix_adm0 %>%
+  filter(!country %in% cities)
+
+
 wb <- full_join(wb_gpss_A,wb_gpss_B,by='country') %>%
   full_join(wb_gpss_C,by='country') %>%
-  full_join(wb_findex,by='country')
+  full_join(wb_findex,by='country') %>%
+  full_join(wb_biz,by='country')
+
   
 rm(wb_findex,wb_gpss_A,wb_gpss_B,wb_gpss_C,rename_tbl,pop,gdp)                                       
 

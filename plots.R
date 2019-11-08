@@ -408,6 +408,8 @@ imf_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 # imf_plot('Colombia')
 # TODO: use some regex to shorten titles a little
 
+
+
 ###############################################################################
 # Infrastructure
 ###############################################################################
@@ -449,6 +451,29 @@ infra_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 # infra_plot('Kenya')
 # infra_plot('Colombia')
   
+###############################################################################
+# Digital trade and e-commerce
+###############################################################################
+source('postal.R')
+
+rename_trade <- tibble(
+  variable=c('db_score','db_trade','iipd'),
+  label=c('Doing business score','Trade across borders','Postal development index'),
+  flip=FALSE
+)
+
+trade_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                       sort_order='none',num_pcs=5) {
+  full_join(wb,iipd,by='country') %>%
+    select(country,one_of(rename_trade$variable)) %>%
+    j2sr_style_plot(rename_trade,country_name,show_pred,
+                    shade_fraction,sort_order,num_pcs) +
+    ggtitle(paste0('Digital trade and e-commerce: ',country_name))
+}
+
+trade_plot('Colombia')
+
+
 ###############################################################################
 # What hasn't been used yet?
 ###############################################################################
