@@ -54,20 +54,26 @@ make_norm <- function(x) {
 # Calculate an "overall" value (based on PC1 of included variables),
 ###############################################################################
 pc1_summary <- function(d,country_name,verbose=TRUE) {
+  # remove rows that can't be imputed because all values (except 'country') are missing
   missing <- is.na(d) %>% rowSums
   d <- d[missing < (ncol(d)-1),]
+  # impute and make PCA projection
   pr <- mice(d,m=1,seed=1234) %>%
     mice::complete(1) %>%
     select(-country) %>%
     prcomp(center=TRUE,scale=TRUE)
   if (verbose) {
-    message('PCA weights')
-    print(pr)
+    message('Weights for PC1:')
+    print(pr$rotation[,1])
   }
+  # if weights for PC1 are negative (on average), then flip it so it has the same
+  # overall direction as the index components
+  flip <- sign(mean(pr$rotation[,1]))
+  # normalize PC1 to same scale used in plots
   d2 <- pr$x %>%
     as_tibble %>%
     cbind(select(d,country)) %>%
-    mutate(PC1=make_norm(PC1))
+    mutate(PC1=make_norm(flip*PC1))
   d2[d2$country==country_name,'PC1']
 }
 
