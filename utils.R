@@ -68,7 +68,7 @@ fix_adm0 <- function(df) {
                                     "Tanzania (United Rep.)","Honduras (Rep.)","Lao","Bahrain (Kingdom)",
                                     "Rwanda (Rep.)","Panama (Rep.)","Saint Christopher (Kitts) and Nevis",
                                     "Venezuela (Bolivarian Rep.)","Syrian Arab Rep.","Congo (Rep.)",
-                                    "State of Libya"),
+                                    "State of Libya","Moldova (Republic of)"),
                           country_new=c('The Bahamas','The Bahamas','Myanmar','Myanmar','Cabo Verde',
                                         'Democratic Republic of the Congo',
                                         'Democratic Republic of the Congo',
@@ -121,7 +121,7 @@ fix_adm0 <- function(df) {
                                         "United Republic of Tanzania","Honduras","Laos","Bahrain",
                                         "Rwanda","Panama","Saint Kitts and Nevis",
                                         "Venezuela","Syria","Republic of the Congo",
-                                        "Libya"))
+                                        "Libya",'Moldova'))
                                        
   tmp <- df %>%
     mutate(country=sub('Saint\\.','Saint',country),
@@ -268,7 +268,7 @@ high_income <- c('Andorra','Germany','Oman','Antigua and Barbuda','Gibraltar','P
                  'Virgin Islands (U.S.)')
 setdiff(all_countries,c(low_income,lmic,umic,high_income)) # only some debatable countries
 
-# why do I need a list of non-countries? Because they are in a lot of WB datasets.
+# why do I need a list of non-countries? Because they are in a lot of datasets.
 non_countries <- c("Arab world","Developing","East Asia & Pacific",
                    "East Asia & Pacific (excluding high income)","Euro area",
                    "Europe & Central Asia","Europe & Central Asia (excluding high income)",
@@ -278,7 +278,11 @@ non_countries <- c("Arab world","Developing","East Asia & Pacific",
                    "Middle East & North Africa (excluding high income)",
                    "Middle income","North America","South Asia","Sub-Saharan Africa",
                    "Sub-Saharan Africa (excluding high income)","Upper middle income",
-                   "World",'BCEAO',"Eastern Caribbean","Eastern Caribbean Currency Union")
+                   "World",'BCEAO',"Eastern Caribbean","Eastern Caribbean Currency Union",
+                   "All countries","Africa","Asia","Central Asia",
+                   "East Asia","Europe","Europe (EU)","Gulf Cooperation Council",
+                   "Latin America","Middle East and North Africa","North Africa",
+                   "Southeast Asia-Pacific")
 
 ###############################################################################
 # Plotting functions
