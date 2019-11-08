@@ -68,7 +68,7 @@ fix_adm0 <- function(df) {
                                     "Tanzania (United Rep.)","Honduras (Rep.)","Lao","Bahrain (Kingdom)",
                                     "Rwanda (Rep.)","Panama (Rep.)","Saint Christopher (Kitts) and Nevis",
                                     "Venezuela (Bolivarian Rep.)","Syrian Arab Rep.","Congo (Rep.)",
-                                    "State of Libya","Moldova (Republic of)"),
+                                    "State of Libya","Moldova (Republic of)",'Great Britain'),
                           country_new=c('The Bahamas','The Bahamas','Myanmar','Myanmar','Cabo Verde',
                                         'Democratic Republic of the Congo',
                                         'Democratic Republic of the Congo',
@@ -121,7 +121,7 @@ fix_adm0 <- function(df) {
                                         "United Republic of Tanzania","Honduras","Laos","Bahrain",
                                         "Rwanda","Panama","Saint Kitts and Nevis",
                                         "Venezuela","Syria","Republic of the Congo",
-                                        "Libya",'Moldova'))
+                                        "Libya",'Moldova','United Kingdom'))
                                        
   tmp <- df %>%
     mutate(country=sub('Saint\\.','Saint',country),
