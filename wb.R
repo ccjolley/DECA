@@ -186,7 +186,7 @@ wb_findex <- read_excel('data/Global Findex Database.xlsx',sheet=1) %>%
          -ends_with('_ed'),-ends_with('_uned'),-ends_with('_rural'))
 
 # Doing Business index
-db_codes <- c('IC.BUS.EASE.DFRN.XQ.DB1719','TRD.ACRS.BRDR.DB1619.DFRN')
+db_codes <- c('IC.BUS.EASE.DFRN.XQ.DB1719','TRD.ACRS.BRDR.DB1619.DFRN','IC.REG.STRT.BUS.DFRN')
 # DB contains some specific cities, in addition to country-level scores
 cities <- c("Beijing","Chittagong","Delhi","Dhaka","Jakarta","Kano",
             "Karachi","Lagos","Lahore","Los Angeles","Mexico City","Monterrey",
@@ -197,7 +197,7 @@ wb_biz <- read_csv('data/DBData.csv') %>%
   filter(code %in% db_codes) %>%
   select(country,indicator,value) %>%
   dcast(country ~ indicator) %>%
-  rename(db_score=2,db_trade=3) %>%
+  rename(db_score=2,db_trade=3,db_startbiz=4) %>%
   fix_adm0 %>%
   filter(!country %in% cities)
 

@@ -1,7 +1,10 @@
-# Extract raw numbers needed to populate template
+---
+title: "DECA index dump: Kenya"
+date: "November 12, 2019"
+output: html_document
+---
 
-# TODO: once I have everything here, make it nice with knitr
-
+```{r echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
 library(tidyverse)
 library(vdem)
 source('utils.R')
@@ -11,146 +14,120 @@ source('fotn.R')
 source('vdem.R')
 source('wb.R')
 source('wef-plots.R')
+source('wjp.R')
 
-cname <- 'Colombia'
+cname <- 'Kenya'
+```
 
-# Mobile penetration (ITU)
-filter(itu,country==cname)$ind_mobile %>%
-  round(1) %>%
-  paste0('Mobile penetration: ',.,'%') %>%
-  message
-# Internet penetration (ITU)
-filter(itu,country==cname)$ind_internet %>%
-  round(1) %>%
-  paste0('Internet penetration: ',.,'%') %>%
-  message
-# Affordability score (GSMA)
-filter(gsma,country==cname)$mci_afford %>%
-  round(1) %>%
-  paste0('Affordability score: ',.,' out of 100') %>%
-  message
-# 
-# Freedom on the Net
-filter(fotn,country==cname)$fotn_total %>%
-  paste0('Freedom on the Net: ',.,' out of 100, higher is less free') %>%
-  message
+## Access & Use
+
+Mobile penetration: `r filter(itu,country==cname)$ind_mobile %>% round(1)`
+
+Internet penetration: `r filter(itu,country==cname)$ind_internet %>% round(1)`
+
+Affordability score: `r filter(gsma,country==cname)$mci_afford %>% round(1)` out of 100
 
 
-# Privacy protection by law (VDem, with interpretation)
+## Censorship, information integrity and digital rights
 
-############## Reusable function for getting V-Dem data with interpretations
-vdem_mesg <- function(cname,varname,interpret_tbl,prefix) {
+```{r echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+vdem_mesg <- function(cname,varname,interpret_tbl) {
   ordname <- paste0(varname,'_ord')
   vdem_priv <- extract_vdem(name_pattern=varname,include_ord=TRUE) %>%
     filter(vdem_country_name==cname) %>%
     arrange(desc(year)) %>%
     head(1) %>%
     rename(value=ordname)
-  paste0(prefix,': ',vdem_priv$value,' (0-4 scale)') %>% message
-  filter(interpret_tbl,value==vdem_priv$value)$label %>% message
+  paste0(vdem_priv$value,' (',min(interpret_tbl$value),'-',max(interpret_tbl$value),' scale): ',
+         filter(interpret_tbl,value==vdem_priv$value)$label)
 }
 
-vdem_mesg(cname,'v2smprivcon',tibble(
+privacy_rename <- tibble(
   value=0:4,
   label=c('The legal framework explicitly allows the government to access any type of personal data on the Internet.',
           'The legal framework explicitly allows the government to access most types of personal data on the Internet.',
           'The legal framework explicitly allows the government to access many types of personal data on the Internet.',
           'The legal framework explicitly allows the government to access only a few types of personal information on the Internet.',
           'The legal framework explicitly allows the government to access personal information on the Internet only in extraordinary circumstances.')
-),"Privacy law content")
+)
 
-
-
-
-
-
-# Gov filtering capacity (VDem)
-vdem_mesg(cname,'v2smgovfilcap',tibble(
+filcap_rename <- tibble(
   value=0:3,
   label=c('The government lacks any capacity to block access to any sites on the Internet.',
           'The government has limited capacity to block access to a few sites on the Internet.',
           'The government has adequate capacity to block access to most, but not all, specific sites on the Internet if it wanted to.',
           'The government has the capacity to block access to any sites on the Internet if it wanted to.')
-),'Government filtering capacity')
+)
 
-# Gov filtering in practice (VDem)
-vdem_mesg(cname,'v2smgovfilprc',tibble(
+filprc_rename <- tibble(
   value=0:4,
   label=c('Extremely often. It is a regular practice for the government to remove political content, except to sites that are pro-government.',
            'Often. The government commonly removes online political content, except sites that are pro-government.',
            'Sometimes. The government successfully removes about half of the critical online political content.',
            'Rarely. There have been only a few occasions on which the government removed political content.',
            'Never, or almost never. The government allows Internet access that is unrestricted.')
-),'Government filtering in practice')
+)
+```
 
+Freedom on the Net: `r filter(fotn,country==cname)$fotn_total` out of 100, higher is less free
 
-# Mobile money acct (Findex) 
-(filter(wb,country==cname)$mm*100) %>%
-  round(1) %>%
-  paste0('Used mobile money in past 12 months: ',.,'%') %>%
-  message
-# Mobile money gender gap
-(filter(wb,country==cname)$mm_gender_gap*100) %>%
-  round(1) %>%
-  paste0('Mobile money gender gap: Women are ',.,'% less likely to use MM than men.') %>%
-  message
-# 
-# Starting a business 
-filter(wb,country==cname)$db_startbiz %>%
-  round(1) %>%
-  paste0('Starting a business score: ',.,' out of 100') %>%
-  message
-# Trading across borders
-filter(wb,country==cname)$db_trade %>%
-  round(1) %>%
-  paste0('Trading across borders score: ',.,' out of 100') %>%
-  message
+Privacy law content: `r vdem_mesg(cname,'v2smprivcon',privacy_rename)`
 
-# TODO: Firm-level tech absorption 
-tmp <- wef_private %>% 
+Government filtering capacity: `r vdem_mesg(cname,'v2smgovfilcap',filcap_rename)`
+
+Government filtering in practice: `r vdem_mesg(cname,'v2smgovfilprc',filprc_rename)`
+
+## Digital Finance
+
+Used mobile money in the past 12 months: `r (filter(wb,country==cname)$mm*100) %>% round(1)`%
+
+Mobile money gender gap: Women are `r (filter(wb,country==cname)$mm_gender_gap*100) %>% round(1)` less likely to use MM than men.
+
+## Digital trade and e-commerce
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+firm_tech <- wef_private %>% 
   select(country,tech_abs) %>% 
   mutate(techrank=rank(desc(tech_abs))) %>% 
   na.omit
-filter(tmp,country==cname)$techrank %>%
-  round(1) %>%
-  paste0('Firm-level tech absorption rank: ',.,' out of ',nrow(tmp)) %>%
-  message
+```
 
-# Gov capacity to regulate (VDem, with interpretation)
-vdem_mesg(cname,'v2smregcap',tibble(
+Starting a business score: `r filter(wb,country==cname)$db_startbiz %>% round(1)` out of 100
+
+Trading across borders score: `r filter(wb,country==cname)$db_trade %>% round(1)` out of 100
+
+Firm-level tech absorption rank: `r filter(firm_tech,country==cname)$techrank %>% round(1)` out of `r nrow(firm_tech)`
+
+## Digital society and governance
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+regcap_rename <- tibble(
   value=0:4,
   label=c('No, almost all online activity happens outside of reach of the state, where it lacks the capacity to remove illegal content.',
           'Not really. The state has extremely limited resources to regulate online content.',
           'Somewhat. The state has the capacity to regulate only some online content or some portions of the law.',
           'Mostly. The state has robust capacity to regulate online content, though not enough to regulate all content and all portions of the law.',
           'Yes, the government has sufficient capacity to regulate all online content.')
-),'Government capacity to regulate online content')
+)
 
-# Avg people's use of social media (VDem)
-vdem_mesg(cname,'v2smorgavgact',tibble(
+avgact_rename <- tibble(
   value=0:4,
   label=c('Never or almost never. Average people have almost never used social media to organize offline political action.',
           'Rarely. Average people do not typically use social media to organize offline political action.',
           'Sometimes. There are a few cases in which average people have used social media to organize offline political action.',
           'Often. There have been several cases in which average people have used social media to organize offline political action.',
           'Regularly. There are numerous cases in which average people have used social media to organize offline political action.')
-),"Average peoples' use of social media to organize offline action")
+)
+```
 
+Government capacity to regulate online content: `r vdem_mesg(cname,'v2smregcap',regcap_rename)`
 
-# Individual rights (WJP rule of law)
-filter(wjp,country==cname)$fundamental_rights %>%
-  round(2) %>%
-  paste0('WJP Fundamental Rights score: ',.,' (0-1 scale)') %>%
-  message
-# 
+Average peoples' use of social media to organize offline action `r vdem_mesg(cname,'v2smorgavgact',avgact_rename)`
 
-# Infrastructure
-filter(gsma,country==cname)$elect %>%
-  round(1) %>%
-  paste0('Electricity access: ',.,'%') %>%
-  message
+WJP Fundamental Rights score: `r filter(wjp,country==cname)$fundamental_rights %>% round(2)` (0-1 scale)
 
-filter(gsma,country==cname)$cov_4G %>%
-  round(1) %>%
-  paste0('4G coverage: ',.,'%') %>%
-  message
+## Infrastructure
+
+Electricity access: `r filter(gsma,country==cname)$elect %>% round(1)`%
+
+4G coverage: `r filter(gsma,country==cname)$cov_4G %>% round(1)`%

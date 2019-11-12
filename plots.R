@@ -131,6 +131,8 @@ source('vdem.R')
 source('fotn.R')
 source('rsf.R')
 
+# TODO: this is just too big; find a reasonable way to split it up. Also include WJP indices
+
 rename_censor <- tibble(
   variable=c('v2smgovfilprc','v2smgovshut',
              'v2smgovsm','v2smgovsmalt','v2smgovsmmon','v2smgovsmcenprc',
@@ -457,8 +459,8 @@ infra_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 source('postal.R')
 
 rename_trade <- tibble(
-  variable=c('db_score','db_trade','iipd'),
-  label=c('Doing business score','Trade across borders','Postal development index'),
+  variable=c('db_score','db_trade','db_startbiz','iipd'),
+  label=c('Doing business score','Trade across borders','Starting a business','Postal development index'),
   flip=FALSE
 )
 
