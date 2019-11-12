@@ -98,6 +98,7 @@ j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
     (flip_at - x) + flip_at
   }
   tmp <- data  %>%
+    select(country,one_of(rename_tbl$variable)) %>%
     mutate_at(rename_tbl$variable,make_norm) %>%
     mutate_at(flip_vars, flip) 
   
