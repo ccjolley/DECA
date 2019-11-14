@@ -11,7 +11,7 @@ library(ggrepel)
 #   fix_adm0() assumes that it's getting a data frame with country names stored
 #   in a column called 'country'.
 ###############################################################################
-fix_adm0 <- function(df) {
+fix_adm0 <- function(df,mapping=FALSE) {
   rename_df <- data_frame(country=c('Bahamas, The','Bahamas','Burma/Myanmar','Burma','Cape Verde',
                                     'Congo, Democratic Republic of the Congo',
                                     'Democratic Republic of Congo',
@@ -131,6 +131,13 @@ fix_adm0 <- function(df) {
     select(-country_new)
   # So hard to get Cote d'Ivoire right
   tmp$country[grep('voire',tmp$country)] <- 'Ivory Coast'
+  # GADM insists on a few weird country names; don't use them unless you're making a map
+  if (!mapping) {
+    tmp <- tmp %>%
+      mutate(country=ifelse(country=='Macedonia','North Macedonia',country),
+             country=ifelse(country=='United States of America','United States',country)
+             country=ifelse(country=='United Republic of Tanzania','Tanzania',country))
+  }
   tmp
 }
 
