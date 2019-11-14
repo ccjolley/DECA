@@ -161,19 +161,78 @@ rename_censor <- tibble(
 ) %>%
   mutate(flip=grepl('\\(.*\\)',label))
 
+# Split into logical clusters based on alignment with PCs
+tmp <- left_join(vdem,fotn,by='country') %>%
+  left_join(rsf,by='country') %>%
+  select(one_of(rename_censor$variable)) %>%
+  mice(m=1,seed=1234) %>%
+  mice::complete(1) %>%
+  mutate_at(filter(rename_censor,flip)$variable, function(x) -x)
+
+pr <- prcomp(tmp,scale=TRUE,center=TRUE)
+qplot(1:ncol(tmp),sort(pr$rotation[,1]))
+pr$rotation[,1] %>% sort(decreasing=TRUE)
+group1 <- c('v2smgovfilprc','v2x_civlib','v2smregcon','v2smarrest','v2x_clpol','v2smdefabu',
+            'v2smgovshut','v2smgovsm','v2smgovsmalt','v2smgovsmcenprc','v2x_clpriv','press_freedom')
+# strongest alignments with civil liberties, shutdowns, arrests for political content
+qplot(1:ncol(tmp),sort(pr$rotation[,2]))
+pr$rotation[,2] %>% sort(decreasing=TRUE)
+group2 <- c('fotn_total','content_limits','access_obstacles','user_violations')
+# four FOTN indices are strongly aligned
+qplot(1:ncol(tmp),sort(pr$rotation[,3]))
+pr$rotation[,3] %>% sort(decreasing=TRUE)
+group3 <- c('v2smprivcon','v2smgovsmmon','v2smprivex','v2smregcap','v2smregapp',
+            'v2smlawpr')
+# aligns with privacy protections, social media monitoring
+qplot(1:ncol(tmp),sort(pr$rotation[,4]))
+pr$rotation[,4] %>% sort(decreasing=TRUE)
+# aligns with disinformation
+group4 <- c('v2smfordom','v2smforads','v2smpardom','v2smparab','v2smgovab','v2smgovdom')
+
 censorship_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                             sort_order='cor',num_pcs=5,overall_score='PC1') {
   left_join(vdem,fotn,by='country') %>%
     left_join(rsf,by='country') %>%
-    select(country,one_of(rename_censor$variable)) %>%
-    j2sr_style_plot(rename_censor,country_name,show_pred,
+    select(country,one_of(group1)) %>%
+    j2sr_style_plot(filter(rename_censor,variable %in% group1),country_name,show_pred,
                     shade_fraction,sort_order,num_pcs,overall_score) +
-      ggtitle(paste0('Censorship, information integrity, and digital rights: ',country_name))
+    ggtitle(paste0('Censorship and civil liberties: ',country_name))
 }
 
-# censorship_plot('Colombia',shade_fraction=0.5,show_pred=FALSE,sort_order='cor')
-# censorship_plot('Kenya',shade_fraction=0.5,show_pred=FALSE,sort_order='cor') 
-# censorship_plot('China',shade_fraction=0.5,show_pred=FALSE,sort_order='cor') 
+fotn_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                            sort_order='cor',num_pcs=5,overall_score='PC1') {
+  left_join(vdem,fotn,by='country') %>%
+    left_join(rsf,by='country') %>%
+    select(country,one_of(group2)) %>%
+    j2sr_style_plot(filter(rename_censor,variable %in% group2),country_name,show_pred,
+                    shade_fraction,sort_order,num_pcs,overall_score) +
+    ggtitle(paste0('Freedom on the Net: ',country_name))
+}
+
+privacy_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                      sort_order='cor',num_pcs=5,overall_score='PC1') {
+  left_join(vdem,fotn,by='country') %>%
+    left_join(rsf,by='country') %>%
+    select(country,one_of(group3)) %>%
+    j2sr_style_plot(filter(rename_censor,variable %in% group3),country_name,show_pred,
+                    shade_fraction,sort_order,num_pcs,overall_score) +
+    ggtitle(paste0('Privacy and surveillance: ',country_name))
+}
+
+info_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
+                      sort_order='cor',num_pcs=5,overall_score='PC1') {
+  left_join(vdem,fotn,by='country') %>%
+    left_join(rsf,by='country') %>%
+    select(country,one_of(group4)) %>%
+    j2sr_style_plot(filter(rename_censor,variable %in% group4),country_name,show_pred,
+                    shade_fraction,sort_order,num_pcs,overall_score) +
+    ggtitle(paste0('Information integrity: ',country_name))
+}
+
+censorship_plot('Colombia')
+fotn_plot('Colombia')
+privacy_plot('Colombia') # TODO: not all seem to point in the right direction
+info_plot('Colombia')
 
 ###############################################################################
 # Cybersecurity
@@ -457,24 +516,33 @@ infra_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 # Digital trade and e-commerce
 ###############################################################################
 source('postal.R')
+source('dtri.R')
 
 rename_trade <- tibble(
-  variable=c('db_score','db_trade','db_startbiz','iipd'),
-  label=c('Doing business score','Trade across borders','Starting a business','Postal development index'),
-  flip=FALSE
-)
+  variable=c('db_score','db_trade','db_startbiz','iipd',
+             'dtri','fiscal_market','establishment','data_restrictions','trading_restrictions'),
+  label=c('Doing business score (WB)','Trade across borders (WB)',
+          'Starting a business (WB)','Postal development index',
+          'Digital Trade Restrictiveness (DTRI)','Fiscal restrictions & market access (DTRI)',
+          'Establishment restrictions (DTRI)','Restrictions on data (DTRI)','Trading restrictions (DTRI)')
+) %>%
+  mutate(flip=grepl('DTRI',label))
 
+
+# Using the mean for the overall score, because DTRI and Doing Business aren't
+# very well-correlated (see China, for example)
 trade_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                       sort_order='none',num_pcs=5) {
+                       sort_order='none',num_pcs=5,overall_score='mean') {
   full_join(wb,iipd,by='country') %>%
+    full_join(dtri,by='country') %>%
     select(country,one_of(rename_trade$variable)) %>%
     j2sr_style_plot(rename_trade,country_name,show_pred,
-                    shade_fraction,sort_order,num_pcs) +
+                    shade_fraction,sort_order,num_pcs,overall_score) +
     ggtitle(paste0('Digital trade and e-commerce: ',country_name))
 }
 
 trade_plot('Colombia')
-
+trade_plot('Kenya')
 
 ###############################################################################
 # What hasn't been used yet?
