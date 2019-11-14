@@ -135,7 +135,7 @@ fix_adm0 <- function(df,mapping=FALSE) {
   if (!mapping) {
     tmp <- tmp %>%
       mutate(country=ifelse(country=='Macedonia','North Macedonia',country),
-             country=ifelse(country=='United States of America','United States',country)
+             country=ifelse(country=='United States of America','United States',country),
              country=ifelse(country=='United Republic of Tanzania','Tanzania',country))
   }
   tmp
