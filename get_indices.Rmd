@@ -131,3 +131,12 @@ WJP Fundamental Rights score: `r filter(wjp,country==cname)$fundamental_rights %
 Electricity access: `r filter(gsma,country==cname)$elect %>% round(1)`%
 
 4G coverage: `r filter(gsma,country==cname)$cov_4G %>% round(1)`%
+
+## TODO
+
+FOTN classification into free, partly-free, etc.
+Change template to use more precise wording around MM accounts
+Add % sign to MM gender gap in Rmd
+Add open government index
+Add something else in place of electricity and telephone infrastructure (maybe an infra scatter plot)
+add 2G-4G coverage
