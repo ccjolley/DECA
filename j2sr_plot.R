@@ -194,7 +194,11 @@ j2sr_style_plot <- function(data,rename_tbl,country_name,show_pred=TRUE,
       geom_point(data=filter(plotme,highlight,!sig),size=3,color='#CFCDC9') 
   }
   ### Add overall score if desired
-  if (!is.null(overall_score)) {
+  if (!overall_score %in% c('none','mean','PC1')) {
+    message(paste0('Invalid value for overall_score: ',overall_score))
+    overall_score <- 'none'
+  }
+  if (overall_score != 'none') {
     if (overall_score == 'mean') {
       overall <- filter(plotme,highlight)$value %>% mean
     } else if (overall_score == 'PC1') {

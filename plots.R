@@ -248,12 +248,12 @@ rename_cyber <- tibble(
 )
 
 cyber_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                            sort_order='cor',num_pcs=5) {
+                            sort_order='cor',num_pcs=5,overall_score='PC1') {
   left_join(vdem,itu,by='country') %>%
     left_join(ncsi,by='country') %>%
     select(country,one_of(rename_cyber$variable)) %>%
     j2sr_style_plot(rename_cyber,country_name,show_pred,
-                    shade_fraction,sort_order,num_pcs) +
+                    shade_fraction,sort_order,num_pcs,overall_score) +
     ggtitle(paste0('Cybersecurity: ',country_name))
 }
 
@@ -287,15 +287,15 @@ rename_society <- tibble(
 )
 
 society_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                        sort_order='cor',num_pcs=5) {
+                        sort_order='cor',num_pcs=5,overall_score='PC1') {
   full_join(vdem,gsma,by='country') %>%
     full_join(wef,by='country') %>%
     full_join(open_data,by='country') %>%
     full_join(wjp,by='country') %>%
     select(country,one_of(rename_society$variable)) %>%
     j2sr_style_plot(rename_society,country_name,show_pred,
-                    shade_fraction,sort_order,num_pcs) +
-    ggtitle(paste0('Digital society and governance: ',country_name))
+                    shade_fraction,sort_order,num_pcs,overall_score) +
+    ggtitle(paste0('Digital society: ',country_name))
 }
 
 # society_plot('Kenya')
@@ -501,7 +501,7 @@ rename_infra <- tibble(
 )
 
 infra_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
-                         sort_order='none',num_pcs=5) {
+                         sort_order='none',num_pcs=5,overall_score='PC1') {
   gsma %>%
     select(country,one_of(rename_infra$variable)) %>%
   j2sr_style_plot(rename_infra,country_name,show_pred,
@@ -541,13 +541,7 @@ trade_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
     ggtitle(paste0('Digital trade and e-commerce: ',country_name))
 }
 
-trade_plot('Colombia')
-trade_plot('Kenya')
+# trade_plot('Colombia')
+# trade_plot('Kenya')
 
-###############################################################################
-# What hasn't been used yet?
-###############################################################################
-c(names(a4ai),names(fotn),names(gsma),names(itu),names(rsf),names(vdem),
-  names(wef),names(wb),names(eiu),names(imf)) %>%
-  setdiff(c(names(data_access),names(data_censor),names(data_society),
-            names(data_econ)))
+
