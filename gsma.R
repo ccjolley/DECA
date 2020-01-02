@@ -14,7 +14,7 @@ mci <- read_excel('data/MCI_Data_2019.xlsx',sheet=3,skip=2) %>%
          cov_2G=`2G Coverage`,cov_3G=`3G Coverage`,cov_4G=`4G Coverage`,
          servers=`Servers per population`,tlds=`TLDs per capita`,ixps=`IXPs per population`,
          download=`Mobile download speeds`,upload=`Mobile upload speeds`,latency=`Mobile latencies`,
-         elect=`Access to electricity`,bandwidth=`International Internet bandwidth per user`,
+         elect=`Access to electricity`,bandwidth_gsma=`International Internet bandwidth per user`,
          spectrum_dd=`Digital dividend spectrum (MHz per operator)`,
          spectrum_low=`Other spectrum below 1GHz (MHz per operator)`,
          spectrum_high=`Spectrum in 1-3GHz bands (MHz per operator)`,

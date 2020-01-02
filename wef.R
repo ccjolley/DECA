@@ -20,7 +20,7 @@ wef_nri <- read_excel('data/WEF_NRI_2012-2016_Historical_Dataset.xlsx',sheet=2,s
   melt(id.var='code') %>%
   dcast(variable ~ code) %>% 
   rename(country=variable,nri_enviro=A,nri_readiness=B,nri_usage=C,nri_impact=D,nri=NRI,
-         bandwidth=`3.03`,mobile_subs=`6.01`,internet_users=`6.02`,fixed_internet=`6.05`,
+         bandwidth_wef=`3.03`,mobile_subs=`6.01`,internet_users=`6.02`,fixed_internet=`6.05`,
          mobile_broadband=`6.06`) %>%
   na.omit %>%
   mutate_at(2:11,as.numeric) %>%
