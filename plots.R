@@ -189,6 +189,34 @@ pr$rotation[,4] %>% sort(decreasing=TRUE)
 # aligns with disinformation
 group4 <- c('v2smfordom','v2smforads','v2smpardom','v2smparab','v2smgovab','v2smgovdom')
 
+# base on group 2
+rename_fotn <- tibble(
+  variable=c('access_obstacles','content_limits',
+             'user_violations','fotn_total'),
+  label=c('Obstacles to access (FH)','Limits on content (FH)',
+          'Violations of user rights (FH)','Freedom on the net (FH)'),
+  flip=TRUE
+)
+
+# base on group 3
+rename_privacy <- tibble(
+  variable = c('v2smprivcon','v2smgovsmmon','v2smprivex','v2smregcap','v2smregapp',
+               'v2smlawpr'),
+  label=c('Privacy protection by law content','Social media monitoring','Privacy protection by law exists',
+          'Gov capacity to regulate online content','Content regulation done by state (not private)',
+          'Defamation protection')
+) %>%
+  mutate(flip=grepl('\\(.*\\)',label))
+
+rename_info <- tibble(
+  variable = c("v2smgovdom","v2smgovab","v2smpardom","v2smparab","v2smfordom","v2smforads"),
+  label=c("Government dissemination of false information domestic","Government dissemination of false information abroad",
+          "Party dissemination of false information domestic","Party dissemination of false information abroad", 
+          "Foreign governments dissemination of false information","Foreign governments ads"),
+  flip=FALSE
+)
+
+
 censorship_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
                             sort_order='cor',num_pcs=5,overall_score='PC1') {
   left_join(vdem,fotn,by='country') %>%
@@ -489,7 +517,7 @@ imf_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 rename_infra <- tibble(
   variable=c("mci_infra","mci_infra_coverage","cov_2G","cov_3G","cov_4G",
              "mci_infra_performance",'download','upload','latency',"mci_infra_enabling",'elect',
-             'bandwidth',"servers","tlds","ixps",
+             'bandwidth_gsma',"servers","tlds","ixps",
              'mci_infra_spectrum','spectrum_dd','spectrum_low','spectrum_high'),
   label=c('Infrastructure (MCI subindex)','Network coverage (MCI dimension)',
           '2G coverage','3G coverage','4G coverage',
@@ -544,4 +572,60 @@ trade_plot <- function(country_name,show_pred=FALSE,shade_fraction=0.5,
 # trade_plot('Colombia')
 # trade_plot('Kenya')
 
+###############################################################################
+# One plotting function to rule them all
+###############################################################################
 
+rename_all <- rbind(rename_access,rename_afford,rename_barrier,rename_censor,
+                    rename_cyber,rename_eiu,rename_findex,rename_findex_gaps,
+                    rename_infra,rename_mmri,rename_sdg4,
+                    rename_sdg4_gaps,rename_society,rename_trade)
+# TODO: rename_imf isn't working here quite yet
+
+plot_frame <- a4ai
+for (t in list(dtri,eiu,fotn,gsma,iipd,itu,ncsi,open_data,rsf,sdg4,vdem,wb,wef,wjp)) {
+  plot_frame <- full_join(plot_frame,t,by='country')
+} 
+plot_frame <- plot_frame %>% select(country,rename_all$variable)
+
+plot_vars <- tibble(
+  plot_name = c('Infrastructure','Access and use','Digital literacy',
+                'Digital literacy gender gaps','Affordability','Digital society',
+                'Censorship and civil liberties','Freedom on the Net',
+                'Privacy and surveillance','Information integrity',
+                'Cybersecurity','EIU Global Microscope',
+                'GSMA Mobile Money Regulatory Index','Findex',
+                'Findex barriers to access','Findex access gaps',
+                'Digital trade and e-commerce'),
+  varlist = sapply(list(rename_infra,rename_access,rename_sdg4,rename_sdg4_gaps,
+                        rename_afford,rename_society,rename_censor,
+                        rename_fotn,rename_privacy,rename_info,rename_cyber,
+                        rename_eiu,rename_mmri,rename_findex,rename_barrier,
+                        rename_findex_gaps,rename_trade),function(x) list(x$variable))
+)
+
+available_countries <- function(pname) {
+  v <- filter(plot_vars,plot_name==pname)$varlist %>% unlist
+  tmp <- plot_frame %>% select(country,v)
+  present <- rowSums(!is.na(select(tmp,-country)))
+  tmp$country[present>0]
+}
+
+# test run
+# sapply(plot_vars$plot_name,function(x) length(available_countries(x)))
+  
+# unified plotting function
+
+deca_plot <- function(pname,country_name,show_pred=FALSE,shade_fraction=0.5,
+                       sort_order='none',num_pcs=5,overall_score='mean') {
+  v <- filter(plot_vars,plot_name==pname)$varlist %>% unlist
+  rename <- rename_all %>% filter(variable %in% v)
+  plot_frame %>%
+    select(country,v) %>%
+    j2sr_style_plot(rename,country_name,show_pred,
+                    shade_fraction,sort_order,num_pcs,overall_score) +
+    ggtitle(paste0(pname,': ',country_name))
+}
+
+# test run
+#deca_plot('Infrastructure','Kenya')
